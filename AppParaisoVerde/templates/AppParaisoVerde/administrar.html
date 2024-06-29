@@ -1,0 +1,1026 @@
+{% load static %}
+
+
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css">
+    <link rel="stylesheet" href="https://cdn.materialdesignicons.com/5.4.55/css/materialdesignicons.min.css">
+    <link rel="stylesheet" href="{% static 'css/estilos.css' %}">
+    <link rel="icon" type="image/x-icon" href="{% static 'img/favicon.png' %}">
+
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+
+    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/js/bootstrap.min.js"></script>
+
+    <script src="{% static 'js/funciones.js' %}"></script>
+    <title>Administrar</title>
+
+</head>
+
+<body>
+    <nav class="navbar navbar-expand-lg navbar-dark bg-dark">
+        <a class="navbar-brand" style="color: #ffffff">Administrar</a>
+        <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarNav"
+            aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
+            <span class="navbar-toggler-icon"></span>
+        </button>
+        <div class="collapse navbar-collapse" id="navbarNav">
+            <ul class="navbar-nav">
+                <li class="nav-item">
+                    <button onclick="mostrarDiv('DivUsuario');" class="nav-link opcion-navbar">Usuarios</button>
+                </li>
+                <li class="nav-item">
+                    <button onclick="mostrarDiv('DivTipoUsuario');" class="nav-link opcion-navbar">Tipos
+                        Usuario</button>
+                </li>
+                <li class="nav-item">
+                    <button onclick="mostrarDiv('DivProducto');" class="nav-link opcion-navbar">Productos</button>
+                </li>
+                <li class="nav-item">
+                    <button onclick="mostrarDiv('DivTipoProducto');" class="nav-link opcion-navbar">Tipos
+                        Producto</button>
+                </li>
+                <li class="nav-item">
+                    <button onclick="mostrarDiv('DivSuscripcionVigente');"
+                        class="nav-link opcion-navbar">Suscripciones</button>
+                </li>
+            </ul>
+            <ul class="navbar-nav ml-auto">
+                <li class="nav-item">
+                    <button class="nav-link opcion-navbar" data-toggle="modal" data-target="#logoutModal">Cerrar
+                        sesión</button>
+                </li>
+            </ul>
+        </div>
+    </nav>
+    <div class="container-fluid" style="margin-top: 20px;">
+
+        <!--COMIENZA DIV USUARIO-->
+        <div id="DivUsuario" style="display: none;">
+            <div class="row">
+                <div class="col-lg-12">
+                    <div class="card card-outline-info">
+                        <div class="card-body">
+                            <h4 class="card-title">Filtros</h4>
+                            <div class="form-body">
+                                <div class="row p-t-20">
+                                    <div class="col-md-6">
+                                        <div class="form-group">
+                                            <label for="NombreBusUsuario">Nombre:</label>
+                                            <input type="text" class="form-control" id="NombreBusUsuario" placeholder="">
+                                        </div>
+                                    </div>
+                                    <div class="col-md-6">
+                                        <div class="form-group col-6">
+                                            <label class="control-label">Tipo Usuario</label>
+                                            <br>
+                                            <select id="cmbDivUsuarioTipoUsuario">
+                                                <option value="0">Seleccione Tipo Usuario</option>
+                                                <option value="1">Administrador</option>
+                                                <option value="2">Usuario</option>
+                                            </select>
+                                        </div>
+                                    </div>
+                                </div>
+                               
+                            </div>
+                            <div class="form-actions">
+                                <button type="button" class="btn custom-button" data-toggle="modal"
+                                    data-target="#modal-agregarUsuario" onclick="PrepararModalAgregarUsuario();"> <i
+                                        class="fa fa-check"></i> Agregar</button>
+                                <button type="button" class="btn custom-button" onclick="buscarUsuarios()"> <i
+                                        class="fa fa-search"></i> Buscar</button>
+                            </div>
+                            <div class="modal fade " id="modal-agregarUsuario" tabindex="-1" role="dialog"
+                                aria-labelledby="exampleModalLabel1">
+                                <div class="modal-dialog modal-lg" role="document">
+                                    <div class="modal-content">
+                                        <div class="modal-header">
+                                            <h4 class="modal-title" id="exampleModalLabel1">Agregar Usuario</h4>
+                                            <button type="button" class="close" data-dismiss="modal"
+                                                aria-label="Close"><span aria-hidden="true">×</span></button>
+                                        </div>
+                                        <div class="modal-body">
+                                            <div class="row">
+                                                <div class="col-md-6">
+                                                    <div class="form-group">
+                                                        <label for="AddNombre" class="control-label">Nombre:</label>
+                                                        <input type="text" class="form-control" id="AddNombreUsuario">
+                                                    </div>
+                                                </div>
+                                                <div class="col-md-6">
+                                                    <div class="form-group">
+                                                        <label for="AddApellido" class="control-label">Apellido:</label>
+                                                        <input type="text" class="form-control" id="AddApellidoUsuario">
+                                                    </div>
+                                                </div>
+                                            </div>
+                                            <div class="row">
+                                                <div class="col-md-6">
+                                                    <div class="form-group">
+                                                        <label for="AddNombre" class="control-label">Dirección:</label>
+                                                        <input type="text" class="form-control" id="AddDireccionUsuario">
+                                                    </div>
+                                                </div>
+                                                <div class="col-md-6">
+                                                    <div class="form-group">
+                                                        <label for="AddApellido" class="control-label">Telefono:</label>
+                                                        <input type="text" class="form-control" id="AddTelefonoUsuario">
+                                                    </div>
+                                                </div>
+                                            </div>
+                                            <div class="row">
+                                                <div class="col-md-6">
+                                                    <div class="form-group">
+                                                        <label for="AddCorreo" class="control-label">Correo:</label>
+                                                        <input type="email" class="form-control" id="AddCorreoUsuario">
+                                                    </div>
+                                                </div>
+                                                <div class="col-md-6">
+                                                    <div class="form-group">
+                                                        <label for="AddContrasena" class="control-label">Contraseña:</label>
+                                                        <input type="password" class="form-control" id="AddContrasenaUsuario">
+                                                    </div>
+                                                </div>
+                                            </div>
+                                            <div class="row">
+                                                <div class="col-md-6">
+                                                    <div class="form-group">
+                                                        <br>
+                                                        <select id="cmbUsuarioAddTipoUsuario">
+                                                            <option value="0">Seleccione Tipo Usuario</option>
+                                                            <option value="1">Administrador</option>
+                                                            <option value="2">Usuario</option>
+                                                        </select>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <div class="modal-footer">
+                                            <button type="button" class="btn btn-default"
+                                                data-dismiss="modal">Cancelar</button>
+                                            <button type="button" class="btn custom-button"
+                                                onclick="RegistrarUsuario();">Grabar</button>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="modal fade " id="modal-editarUsuario" tabindex="-1" role="dialog"
+                                aria-labelledby="exampleModalLabel1">
+                                <div class="modal-dialog modal-lg" role="document">
+                                    <div class="modal-content">
+                                        <div class="modal-header">
+                                            <h4 class="modal-title" id="exampleModalLabel1">Editar Usuario</h4>
+                                            <button type="button" class="close" data-dismiss="modal"
+                                                aria-label="Close"><span aria-hidden="true">×</span></button>
+                                        </div>
+                                        <div class="modal-body">
+                                            <div class="row">
+                                                <div class="col-md-6">
+                                                    <div class="form-group">
+                                                        <label for="EditNombreUsuario" class="control-label">Nombre:</label>
+                                                        <input type="text" class="form-control" id="EditNombreUsuario">
+                                                    </div>
+                                                </div>
+                                                <div class="col-md-6">
+                                                    <div class="form-group">
+                                                        <label for="EditApellidoUsuario" class="control-label">Apellido:</label>
+                                                        <input type="text" class="form-control" id="EditApellidoUsuario">
+                                                    </div>
+                                                </div>
+                                            </div>
+                                            <div class="row">
+                                                <div class="col-md-6">
+                                                    <div class="form-group">
+                                                        <label for="EditDireccionUsuario" class="control-label">Dirección:</label>
+                                                        <input type="text" class="form-control" id="EditDireccionUsuario">
+                                                    </div>
+                                                </div>
+                                                <div class="col-md-6">
+                                                    <div class="form-group">
+                                                        <label for="EditTelefonoUsuario" class="control-label">Telefono:</label>
+                                                        <input type="text" class="form-control" id="EditTelefonoUsuario">
+                                                    </div>
+                                                </div>
+                                            </div>
+                                            <div class="row">
+                                                <div class="col-md-6">
+                                                    <div class="form-group">
+                                                        <label for="EditCorreoUsuario" class="control-label">Correo:</label>
+                                                        <input type="email" class="form-control" id="EditCorreoUsuario">
+                                                    </div>
+                                                </div>
+                                                <div class="col-md-6">
+                                                    <div class="form-group">
+                                                        <label for="EditContrasenaUsuario" class="control-label">Contraseña:</label>
+                                                        <input type="password" class="form-control" id="EditContrasenaUsuario">
+                                                    </div>
+                                                </div>
+                                            </div>
+                                            <div class="row">
+                                                <div class="col-md-6">
+                                                    <div class="form-group">
+                                                        <br>
+                                                        <select id="cmbUsuarioEditTipoUsuario">
+                                                            <option value="0">Seleccione Tipo Usuario</option>
+                                                            <option value="1">Administrador</option>
+                                                            <option value="2">Usuario</option>
+                                                        </select>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <div class="modal-footer">
+                                            <button type="button" class="btn btn-default"
+                                                data-dismiss="modal">Cancelar</button>
+                                            <button type="button" class="btn custom-button"
+                                                onclick="EditarUsuario();">Grabar</button>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="modal fade" id="modal-confirmaEliminarUsuario" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
+                                <div class="modal-dialog">
+                                    <div class="modal-content">
+                                        <div class="modal-header">
+                                            <h4>
+                                                Confirmación
+                                            </h4>
+                                        </div>
+                                        <div class="modal-body">
+                                            <p id="idMensajeEliminarUsuario"></p>
+                                        </div>
+                                        <div class="modal-footer">
+                                            <button type="button" class="btn btn-large pull-right btn-default" style='margin:5px;' data-dismiss="modal">
+                                                Cancelar
+                                            </button>
+                                            <button type="button" class="btn btn-large pull-right btn-success" style='margin:5px;' data-dismiss="modal" onclick="EliminarUsuario();">
+                                                Aceptar
+                                            </button>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="row">
+                <div class="col-12">
+                    <div class="card">
+                        <div class="card-body">
+                            <h4 class="card-title">Listado de Usuarios</h4>
+                            <table class="table" id="tablaUsuarios">
+                                <thead>
+                                    <tr>
+                                        <th scope="col">Id</th>
+                                        <th scope="col">Nombre</th>
+                                        <th scope="col">Email</th>
+                                        <th scope="col">Telefono</th>
+                                        <th scope="col">Direccion</th>
+                                        <th scope="col">Tipo Usuario</th>
+                                        <th scope="col">Acciones</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div id="divMensajeNoEncontradoUsuario"> <h1>No se encontraron Usuarios</h1> </div>
+
+        </div>
+         <!--TERMINA DIV USUARIO-->
+
+
+        <!--COMIENZA DIV TIPO USUARIO-->
+        <div id="DivTipoUsuario" style="display: none;">
+            <div class="row">
+                <div class="col-lg-12">
+                    <div class="card card-outline-info">
+                        <div class="card-body">
+                            <h4 class="card-title">Filtros</h4>
+                            <div class="form-body">
+                                <div class="row p-t-20">
+                                    <div class="col-md-6">
+                                        <div class="form-group">
+                                            <label class="control-label">Nombre</label>
+                                            <input type="text" class="form-control" id="NombreBusTipoUsuario">
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="form-actions">
+                                <button type="button" class="btn custom-button" data-toggle="modal"
+                                    data-target="#modal-agregarTipoUsuario" onclick="PrepararModalAgregarTipoUsuario();"> <i
+                                        class="fa fa-check"></i> Agregar</button>
+                                <button type="button" class="btn custom-button" onclick="buscarTiposUsuario()"> <i
+                                        class="fa fa-search"></i> Buscar</button>
+                            </div>
+
+                            <div class="modal fade " id="modal-agregarTipoUsuario" tabindex="-1" role="dialog"
+                                aria-labelledby="exampleModalLabel1">
+                                <div class="modal-dialog modal-lg" role="document">
+                                    <div class="modal-content">
+                                        <div class="modal-header">
+                                            <h4 class="modal-title" id="exampleModalLabel1">Agregar Tipo Usuario</h4>
+                                            <button type="button" class="close" data-dismiss="modal"
+                                                aria-label="Close"><span aria-hidden="true">×</span></button>
+                                        </div>
+                                        <div class="modal-body">
+                                            <div class="row">
+                                                <div class="col-12">
+                                                    <div class="form-group">
+                                                        <label for="NombreAddTipoUsuario" class="control-label">Nombre:</label>
+                                                        <input type="text" class="form-control" id="NombreAddTipoUsuario">
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <div class="modal-footer">
+                                            <button type="button" class="btn btn-default"
+                                                data-dismiss="modal">Cancelar</button>
+                                            <button type="button" class="btn custom-button"
+                                                onclick="GrabarTipoUsuario();">Grabar</button>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+
+
+                            <div class="modal fade " id="modal-editarTipoUsuario" tabindex="-1" role="dialog"
+                                aria-labelledby="exampleModalLabel1">
+                                <div class="modal-dialog modal-lg" role="document">
+                                    <div class="modal-content">
+                                        <div class="modal-header">
+                                            <h4 class="modal-title" id="exampleModalLabel1">Editar Tipo Usuario</h4>
+                                            <button type="button" class="close" data-dismiss="modal"
+                                                aria-label="Close"><span aria-hidden="true">×</span></button>
+                                        </div>
+                                        <div class="modal-body">
+                                            <div class="row">
+                                                <div class="col-12">
+                                                    <div class="form-group">
+                                                        <label for="NombreEditTipoUsuario" class="control-label">Nombre:</label>
+                                                        <input type="text" class="form-control" id="NombreEditTipoUsuario">
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <div class="modal-footer">
+                                            <button type="button" class="btn btn-default"
+                                                data-dismiss="modal">Cancelar</button>
+                                            <button type="button" class="btn custom-button"
+                                                onclick="EditarTipoUsuario();">Grabar</button>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="modal fade" id="modal-confirmaEliminarTipoUsuario" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
+                                <div class="modal-dialog">
+                                    <div class="modal-content">
+                                        <div class="modal-header">
+                                            <h4>
+                                                Confirmación
+                                            </h4>
+                                        </div>
+                                        <div class="modal-body">
+                                            <p id="idMensajeEliminrTipoUsuario"></p>
+                                        </div>
+                                        <div class="modal-footer">
+                                            <button type="button" class="btn btn-large pull-right btn-default" style='margin:5px;' data-dismiss="modal">
+                                                Cancelar
+                                            </button>
+                                            <button type="button" class="btn btn-large pull-right btn-success" style='margin:5px;' data-dismiss="modal" onclick="EliminarTipoUsuario();">
+                                                Aceptar
+                                            </button>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+
+
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+
+            <div class="row">
+                <div class="col-12">
+                    <div class="card">
+                        <div class="card-body">
+                            <h4 class="card-title">Listado de Tipos de Usuario</h4>
+                            <table class="table" id="tablaTipoUsuario">
+                                <thead>
+                                    <tr>
+                                        <th scope="col">Identificador</th>
+                                        <th scope="col">Nombre</th>
+                                        <th scope="col">Cantidad de Usuarios</th>
+                                        <th scope="col">Acciones</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+        
+                                </tbody>
+                            </table>
+
+
+
+
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div id="divMensajeNoEncontradoTipoUsuario"> <h1>No se encontraron tipos de Usuario</h1> </div>
+
+        </div>
+        <!--TERMINA DIV TIPO USUARIO-->
+
+
+        <!--COMIENZA DIV PRODUCTO-->
+        <div id="DivProducto" style="display: none;">
+            <div class="row">
+                <div class="col-lg-12">
+                    <div class="card card-outline-info">
+                        <div class="card-body">
+                            <h4 class="card-title">Filtros</h4>
+                            <div class="form-body">
+                                <div class="row p-t-20">
+                                    <div class="col-md-6">
+                                        <div class="form-group col-6">
+                                            <label class="control-label">Precio</label>
+                                            <input type="number" class="form-control" id="PrecioProductoBus">
+                                        </div>
+                                    </div>
+                                    <div class="col-md-6">
+                                        <div class="form-group col-6">
+                                            <label class="control-label">Nombre</label>
+                                            <input type="text" class="form-control" id="NombreProductoBus">
+                                        </div>
+                                    </div>
+                                   
+                                </div>
+                                <div class="row">
+                                    <div class="col-md-6">
+                                        <div class="form-group col-6">
+                                            <label class="control-label">Tipo</label>
+                                            <select class="form-control custom-select" id="cboProductoTipoProductoBus">
+                                            </select>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="form-actions">
+                                <button type="button" class="btn custom-button" data-toggle="modal"
+                                    data-target="#modal-agregarProductos" onclick="PrepararModalAgregarProducto();"> <i
+                                        class="fa fa-check"></i> Agregar</button>
+                                <button type="button" class="btn custom-button" onclick="buscarProductos()"> <i
+                                        class="fa fa-search"></i> Buscar</button>
+                            </div>
+                            <div class="modal fade " id="modal-agregarProductos" tabindex="-1" role="dialog"
+                                aria-labelledby="exampleModalLabel1">
+                                <div class="modal-dialog modal-lg" role="document">
+                                    <div class="modal-content">
+                                        <div class="modal-header">
+                                            <h4 class="modal-title" id="exampleModalLabel1">Agregar Producto</h4>
+                                            <button type="button" class="close" data-dismiss="modal"
+                                                aria-label="Close"><span aria-hidden="true">×</span></button>
+                                        </div>
+                                        <div class="modal-body">
+                                            <div class="row">
+                                                <div class="col-md-6">
+                                                    <div class="form-group">
+                                                        <label for="AddNombreProducto" class="control-label">Nombre:</label>
+                                                        <input type="text" class="form-control" id="AddNombreProducto">
+                                                    </div>
+                                                </div>
+                                                <div class="col-md-6">
+                                                    <div class="form-group">
+                                                        <label for="AddDescripcionProducto" class="control-label">Descripción:</label>
+                                                        <input type="text" class="form-control" id="AddDescripcionProducto">
+                                                    </div>
+                                                </div>
+                                            </div>
+                                            <div class="row">
+                                                <div class="col-md-6">
+                                                    <div class="form-group">
+                                                        <label for="AddPrecioProducto" class="control-label">Precio Unitario:</label>
+                                                        <input type="text" class="form-control" id="AddPrecioProducto">
+                                                    </div>
+                                                </div>
+                                                <div class="col-md-6">
+                                                    <div class="form-group">
+                                                        <label for="AddImagenProducto" class="control-label">Foto Producto:</label>
+                                                        <input type="file" class="form-control" id="AddImagenProducto">
+                                                    </div>
+                                                </div>
+                                            </div>
+                                            <div class="row">
+                                                <div class="col-md-6">
+                                                    <div class="form-group">
+                                                        <label for="AddStockProducto" class="control-label">Stock actual:</label>
+                                                        <input type="email" class="form-control" id="AddStockProducto">
+                                                    </div>
+                                                </div>
+                                                <div class="col-md-6">
+                                                    <div class="form-group">
+                                                        <br>
+                                                        <select id="cmbProductoAddTipoProducto">
+                                                            <option value="0">Seleccione Tipo Producto</option>
+                                                            <option value="1">Administrador</option>
+                                                            <option value="2">Usuario</option>
+                                                        </select>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                           
+                                        </div>
+                                        <div class="modal-footer">
+                                            <button type="button" class="btn btn-default"
+                                                data-dismiss="modal">Cancelar</button>
+                                            <button type="button" class="btn custom-button"
+                                                onclick="GrabarProducto();">Grabar</button>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="modal fade " id="modal-editarProducto" tabindex="-1" role="dialog"
+                                aria-labelledby="exampleModalLabel1">
+                                <div class="modal-dialog modal-lg" role="document">
+                                    <div class="modal-content">
+                                        <div class="modal-header">
+                                            <h4 class="modal-title" id="exampleModalLabel1">Editar Producto</h4>
+                                            <button type="button" class="close" data-dismiss="modal"
+                                                aria-label="Close"><span aria-hidden="true">×</span></button>
+                                        </div>
+                                        <div class="modal-body">
+                                            <div class="row">
+                                                <div class="col-md-6">
+                                                    <div class="form-group">
+                                                        <label for="EditNombreProducto" class="control-label">Nombre:</label>
+                                                        <input type="text" class="form-control" id="EditNombreProducto">
+                                                    </div>
+                                                </div>
+                                                <div class="col-md-6">
+                                                    <div class="form-group">
+                                                        <label for="EditDescripcionProducto" class="control-label">Descripción:</label>
+                                                        <input type="text" class="form-control" id="EditDescripcionProducto">
+                                                    </div>
+                                                </div>
+                                            </div>
+                                            <div class="row">
+                                                <div class="col-md-6">
+                                                    <div class="form-group">
+                                                        <label for="EditPrecioProducto" class="control-label">Precio Unitario:</label>
+                                                        <input type="text" class="form-control" id="EditPrecioProducto">
+                                                    </div>
+                                                </div>
+                                                <div class="col-md-6">
+                                                    <div class="form-group">
+                                                        <label for="EditImagenProducto" class="control-label">Cambiar Foto Producto:</label>
+                                                        <input type="file" class="form-control" id="EditImagenProducto">
+                                                    </div>
+                                                </div>
+                                            </div>
+                                            <div class="row">
+                                                <div class="col-md-6">
+                                                    <div class="form-group">
+                                                        <label for="EditStockProducto" class="control-label">Stock actual:</label>
+                                                        <input type="email" class="form-control" id="EditStockProducto">
+                                                    </div>
+                                                </div>
+                                                <div class="col-md-6">
+                                                    <div class="form-group">
+                                                        <br>
+                                                        <select id="cmbProductoEditTipoProducto">
+                                                            <option value="0">Seleccione Tipo Producto</option>
+                                                            <option value="1">Administrador</option>
+                                                            <option value="2">Usuario</option>
+                                                        </select>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                            <div class="row">
+                                                <div class="col-md-6">
+                                                    <div class="form-group" id="divFotoEditProducto">
+                                                        
+                                                    </div>
+                                                </div>
+                                                
+                                            </div>
+                                        </div>
+                                        <div class="modal-footer">
+                                            <button type="button" class="btn btn-default"
+                                                data-dismiss="modal">Cancelar</button>
+                                            <button type="button" class="btn custom-button"
+                                                onclick="EditarProducto();">Grabar</button>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="modal fade" id="modal-confirmaEliminarProducto" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
+                                <div class="modal-dialog">
+                                    <div class="modal-content">
+                                        <div class="modal-header">
+                                            <h4>
+                                                Confirmación
+                                            </h4>
+                                        </div>
+                                        <div class="modal-body">
+                                            <p id="idMensajeEliminarProducto"></p>
+                                        </div>
+                                        <div class="modal-footer">
+                                            <button type="button" class="btn btn-large pull-right btn-default" style='margin:5px;' data-dismiss="modal">
+                                                Cancelar
+                                            </button>
+                                            <button type="button" class="btn btn-large pull-right btn-success" style='margin:5px;' data-dismiss="modal" onclick="EliminarProducto();">
+                                                Aceptar
+                                            </button>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="row">
+                <div class="col-12">
+                    <div class="card">
+                        <div class="card-body">
+                            <h4 class="card-title">Listado de Productos</h4>
+                            <table class="table" id="tablaProductos">
+                                <thead>
+                                    <tr>
+                                        <th scope="col">Identificador</th>
+                                        <th scope="col">Nombre</th>
+                                        <th scope="col">Precio</th>
+                                        <th scope="col">Stock</th>
+                                        <th scope="col">Descripción</th>
+                                        <th scope="col">Tipo Producto</th>
+                                        <th scope="col">Acciones</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+        
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            </div>
+                        <div id="divMensajeNoEncontradoProductos"> <h1>No se encontraron Productos</h1> </div>
+
+        </div>
+        <!--TERMINA DIV PRODUCTO-->
+
+
+        <!--COMIENZA DIV TIPO PRODUCTO-->
+        <div id="DivTipoProducto" style="display: none;">
+            <div class="row">
+                <div class="col-lg-12">
+                    <div class="card card-outline-info">
+                        <div class="card-body">
+                            <h4 class="card-title">Filtros</h4>
+                            <div class="form-body">
+                                <div class="row p-t-20">
+                                    <div class="col-md-6">
+                                        <div class="form-group">
+                                            <label class="control-label">Nombre</label>
+                                            <input type="text" class="form-control" id="NombreBusTipoProducto">
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="form-actions">
+                                <button type="button" class="btn custom-button" data-toggle="modal"
+                                    data-target="#modal-agregarTipoProducto" onclick="PrepararModalAgregarTipoProducto();"> <i
+                                        class="fa fa-check"></i> Agregar</button>
+                                <button type="button" class="btn custom-button" onclick="buscarTipoProducto()"> <i
+                                        class="fa fa-search"></i> Buscar</button>
+                            </div>
+                            <div class="modal fade " id="modal-agregarTipoProducto" tabindex="-1" role="dialog"
+                                aria-labelledby="exampleModalLabel1">
+                                <div class="modal-dialog modal-lg" role="document">
+                                    <div class="modal-content">
+                                        <div class="modal-header">
+                                            <h4 class="modal-title" id="exampleModalLabel1">Agregar Tipo Producto</h4>
+                                            <button type="button" class="close" data-dismiss="modal"
+                                                aria-label="Close"><span aria-hidden="true">×</span></button>
+                                        </div>
+                                        <div class="modal-body">
+                                          
+                                            <div class="row">
+                                                <div class="col-6">
+                                                    <div class="form-group">
+                                                        <label for="AddAppMat" class="control-label">Nombre:</label>
+                                                        <input type="text" class="form-control" id="NombreAddTipoProducto">
+                                                    </div>
+                                                </div>
+                                            </div>
+                                    
+                                           
+                                        </div>
+                                        <div class="modal-footer">
+                                            <button type="button" class="btn btn-default"
+                                                data-dismiss="modal">Cancelar</button>
+                                            <button type="button" class="btn custom-button"
+                                                onclick="GrabarTipoProducto();">Grabar</button>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+
+
+                            <div class="modal fade " id="modal-editarTipoProducto" tabindex="-1" role="dialog"
+                            aria-labelledby="exampleModalLabel1">
+                            <div class="modal-dialog modal-lg" role="document">
+                                <div class="modal-content">
+                                    <div class="modal-header">
+                                        <h4 class="modal-title" id="exampleModalLabel1">Editar Tipo Producto</h4>
+                                        <button type="button" class="close" data-dismiss="modal"
+                                            aria-label="Close"><span aria-hidden="true">×</span></button>
+                                    </div>
+                                    <div class="modal-body">
+                                        <div class="row">
+                                            <div class="col-12">
+                                                <div class="form-group">
+                                                    <label for="NombreEditTipoProducto" class="control-label">Nombre:</label>
+                                                    <input type="text" class="form-control" id="NombreEditTipoProducto">
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="modal-footer">
+                                        <button type="button" class="btn btn-default"
+                                            data-dismiss="modal">Cancelar</button>
+                                        <button type="button" class="btn custom-button"
+                                            onclick="EditarTipoProducto();">Grabar</button>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="modal fade" id="modal-confirmaEliminarTipoProducto" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
+                            <div class="modal-dialog">
+                                <div class="modal-content">
+                                    <div class="modal-header">
+                                        <h4>
+                                            Confirmación
+                                        </h4>
+                                    </div>
+                                    <div class="modal-body">
+                                        <p id="idMensajeEliminarTipoProducto"></p>
+                                    </div>
+                                    <div class="modal-footer">
+                                        <button type="button" class="btn btn-large pull-right btn-default" style='margin:5px;' data-dismiss="modal">
+                                            Cancelar
+                                        </button>
+                                        <button type="button" class="btn btn-large pull-right btn-success" style='margin:5px;' data-dismiss="modal" onclick="EliminarTipoProducto();">
+                                            Aceptar
+                                        </button>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="row">
+                <div class="col-12">
+                    <div class="card">
+                        <div class="card-body">
+                            <h4 class="card-title">Listado de Tipos de Producto</h4>
+                            <table class="table" id="tablaTipoProducto">
+                                <thead>
+                                    <tr>
+                                        <th scope="col">Identificador</th>
+                                        <th scope="col">Nombre</th>
+                                        <th scope="col">Cantidad de Productos</th>
+                                        <th scope="col">Acciones</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+        
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div id="divMensajeNoEncontradoTipoProducto"> <h1>No se encontraron tipos de Producto</h1> </div>
+
+            
+        </div>
+        <!--TERMINA DIV TIPO PRODUCTO-->
+
+
+        <!--COMIENZA DIV SUSCRIPCION VIGENTE-->
+        <div id="DivSuscripcionVigente" style="display: none;">
+            <div class="row">
+                <div class="col-lg-12">
+                    <div class="card card-outline-info">
+                        <div class="card-body">
+                            <h4 class="card-title">Filtros</h4>
+                            <div class="form-body">
+                                <div class="row p-t-20">
+                                    <div class="col-md-6">
+                                        <div class="form-group">
+                                            <label class="control-label">Familia</label>
+                                            <select class="form-control custom-select" id="cboFamiliaBus">
+                                        
+                                            </select>
+                                        </div>
+                                    </div>
+                                    <div class="col-md-6">
+                                        <div class="form-group">
+                                            <label class="control-label">Sub Familia</label>
+                                            <select class="form-control custom-select" id="cboSubFamiliaBus">
+                                            </select>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="row">
+                                    <div class="col-md-6">
+                                        <div class="form-group">
+                                            <label class="control-label">Código</label>
+                                            <input type="text" class="form-control" id="CodigoBus">
+                                        </div>
+                                    </div>
+                                    <div class="col-md-6">
+                                        <div class="form-group">
+                                            <label class="control-label">Nombre</label>
+                                            <input type="text" class="form-control" id="NombreBus">
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="form-actions">
+                                <button type="button" class="btn custom-button" data-toggle="modal"
+                                    data-target="#modal-agregarSuscripcion" onclick="PrepararModalAgregarSuscripcion();"> <i
+                                        class="fa fa-check"></i> Agregar</button>
+                                <button type="button" class="btn custom-button" onclick="BuscarSuscripciones()"> <i
+                                        class="fa fa-search"></i> Buscar</button>
+                            </div>
+                            <div class="modal fade " id="modal-agregarSuscripcion" tabindex="-1" role="dialog"
+                                aria-labelledby="exampleModalLabel1">
+                                <div class="modal-dialog modal-lg" role="document">
+                                    <div class="modal-content">
+                                        <div class="modal-header">
+                                            <h4 class="modal-title" id="exampleModalLabel1">Agregar Suscripcion</h4>
+                                            <button type="button" class="close" data-dismiss="modal"
+                                                aria-label="Close"><span aria-hidden="true">×</span></button>
+                                        </div>
+                                        <div class="modal-body">
+                                            <div class="row">
+                                                <div class="col-md-6">
+                                                    <div class="form-group">
+                                                        <label for="AddRut" class="control-label">Familia:</label>
+                                                        <select class="form-control custom-select" id="cboFamiliaAdd">
+                                                        </select>
+                                                    </div>
+                                                </div>
+                                                <div class="col-md-6">
+                                                    <div class="form-group">
+                                                        <label for="AddNombres" class="control-label">Sub
+                                                            Familia:</label>
+                                                        <select class="form-control custom-select"
+                                                            id="cboSubFamiliaAdd">
+                                                        </select>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                            <div class="row" style="display: none;">
+                                                <div class="col-md-6">
+                                                    <div class="form-group">
+                                                        <label for="AddAppPat" class="control-label">Código
+                                                            genérico:</label>
+                                                        <input type="text" class="form-control" id="CodigoAdd">
+                                                    </div>
+                                                </div>
+                                            </div>
+                                            <div class="row">
+                                                <div class="col-12">
+                                                    <div class="form-group">
+                                                        <label for="AddAppMat" class="control-label">Nombre:</label>
+                                                        <input type="text" class="form-control" id="NombreAdd">
+                                                    </div>
+                                                </div>
+                                            </div>
+                                            <div class="row">
+                                                <div class="col-12">
+                                                    <div class="form-group">
+                                                        <label for="AddTelefono"
+                                                            class="control-label">Descripción:</label>
+                                                        <input type="text" class="form-control" id="DescripcionAdd">
+                                                    </div>
+                                                </div>
+                                            </div>
+                                            <div class="row">
+                                                <div class="col-md-6">
+                                                    <div class="form-group">
+                                                        <div class="form-group">
+                                                            <label for="AddNombres" class="control-label">Unidad de
+                                                                Medida:</label>
+                                                            <select class="form-control custom-select"
+                                                                id="cboUnidadMedidaAdd">   
+                                                            </select>
+                                                        </div>
+
+                                                    </div>
+                                                </div>
+                                                <div class="col-md-6">
+                                                    <div class="form-group">
+                                                        <label for="AddEmail" class="control-label">Precio:</label>
+                                                        <input type="text" class="form-control" id="PrecioAdd">
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <div class="modal-footer">
+                                            <button type="button" class="btn btn-default"
+                                                data-dismiss="modal">Cancelar</button>
+                                            <button type="button" class="btn custom-button"
+                                                onclick="">Grabar</button>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="row">
+                <div class="col-12">
+                    <div class="card">
+                        <div class="card-body">
+                            <h4 class="card-title">Listado de Suscripciones</h4>
+                            <table class="table" id="tablaTipoUsuario">
+                                <thead>
+                                    <tr>
+                                        <th scope="col">Nombre</th>
+                                        <th scope="col">Rut</th>
+                                        <th scope="col">Tipo</th>
+                                        <th scope="col">Telefono</th>
+                                        <th scope="col">Acciones</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+        
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <!--TERMINA DIV SUSCRIPCION VIGENTE-->
+
+    </div>
+
+
+  
+
+
+
+
+
+    <!-- Logout Modal-->
+    <div class="modal fade" id="logoutModal" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel"
+        aria-hidden="true">
+        <div class="modal-dialog" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="exampleModalLabel">¿Listo para salir?</h5>
+                    <button class="close" type="button" data-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">×</span>
+                    </button>
+                </div>
+                <div class="modal-body">Selecciona "Cerrar sesión" a continuación si estás listo para finalizar tu
+                    sesión actual.</div>
+                <div class="modal-footer">
+                    <button class="btn custom-button" type="button" data-dismiss="modal">Cancelar</button>
+                    <button class="btn custom-button" type="button" onclick="CerrarSesion();"
+                        data-dismiss="modal">Cerrar sesión</button>
+                </div>
+            </div>
+        </div>
+    </div>
+</body>
+
+</html>

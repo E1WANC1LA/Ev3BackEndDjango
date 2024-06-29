@@ -1,0 +1,184 @@
+{% load static %}
+
+<!DOCTYPE html>
+<head>
+
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css">
+    <link rel="stylesheet" href="https://cdn.materialdesignicons.com/5.4.55/css/materialdesignicons.min.css">
+    <link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.15.4/css/all.css">
+    <!-- Incluir jQuery solo una vez, la versión completa -->
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+    <!-- Bootstrap JS depende de jQuery, así que debe ir después de jQuery -->
+    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/js/bootstrap.min.js"></script>
+    <!-- Tus scripts personalizados van al final, después de las librerías de terceros -->
+    <script src="{% static 'js/funciones.js' %}"></script>
+    <link rel="stylesheet" href="{% static 'css/estilos.css' %}">
+    <link rel="icon" type="image/x-icon" href="{% static 'img/favicon.png' %}">
+    <title>Paraíso Verde | Productos</title>
+    <style>  .carrito-color {
+        color: #007bff; /* Cambia esto por el color que desees para el ícono del carrito */
+    }
+    body {
+                font-family: "Open Sans", sans-serif;
+                height: 100vh;
+                background: url("{% static 'img/fondo.jpg' %}") 50% fixed;
+    
+                background-size: cover;
+            }
+            .imagen-carrito {
+    width: 75px;
+    height: 75px;
+    object-fit: cover; /* Asegura que la imagen se recorte para llenar el contenedor sin distorsionarse */
+}
+
+    .carrito-cantidad {
+        background-color: #28a745; /* Cambia esto por el color que desees para el fondo del span */
+        color: #ffffff; /* Cambia esto por el color que desees para el texto dentro del span */
+    }</style>
+    <script> 
+        $(document).ready(function() {
+           LlenarNavbar();
+           ObtenerCantidadProductosCarro();
+           buscarProductosCarrito();
+           $('.nav-link').on('click', function() {
+               // Eliminar la clase active-link de todos los enlaces
+               $('.nav-link').removeClass('active-link');
+               // Añadir la clase active-link al enlace clicado
+               $(this).addClass('active-link');
+           });
+       });
+   </script>
+</head>
+
+<body>
+   <div id="idNavbar"></div>
+    <div class="container-fluid" style="margin-top: 10px;">
+        <div class="container mt-5" id="divTablaCarrito">
+            <h1 class="mb-4" style="background-color: #800080; color: #ffffff;">Carrito de Compras</h1>
+            <table class="table table-bordered" id="tablaProductosCarrito">
+                <thead class="thead" style="background-color: #800080; color: #ffffff;">
+                    <tr >
+                        <th>Imagen</th>
+                        <th>Nombre</th>
+                        <th>Descripción</th>
+                        <th>Precio</th>
+                        <th>Cantidad</th>
+                        <th>Acción</th>
+                    </tr>
+                </thead>
+                <tbody style="background-color: #000000; color: #ffffff;">
+                </tbody>
+            </table>
+        </div>
+        <div class="col-md-9 custom-container"  id="divMensajeNoEncontradoProductosCarrito" style="background-color: #800080; color: #ffffff; display: none;">
+               <h2>No tienes productos en el carro</h2>
+           </div>
+           <br>
+        <br>
+        <br>
+        <br>
+        <br>
+        <br>
+        <br>
+        <br>
+        <br>
+        <br>
+        <br>
+        <br>
+        <br>
+        <br>
+        <br>
+        <br>
+        <br>
+        <br>
+      
+   </div>
+
+
+  
+   <div class="modal fade" id="modal-confirmaEliminarProducto" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h4>
+                    Confirmación
+                </h4>
+            </div>
+            <div class="modal-body">
+                <p id="idMensajeEliminarProducto"></p>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-large pull-right btn-default" style='margin:5px;' data-dismiss="modal">
+                    Cancelar
+                </button>
+                <button type="button" class="btn btn-large pull-right custom-button" style='margin:5px;' data-dismiss="modal" onclick="EliminarProductoCarrito();">
+                    Aceptar
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
+    <!-- FOOTER -->
+    <footer class="container-fluid navbar-personalizado d-flex align-items-center">
+       <div class="row">
+           <div class="col">
+               <div class="logo-background">
+                   <img src="{% static 'img/logoJardineria.png' %}" alt="Logo de Paraiso Verde" style="margin-top: 40px; margin-bottom: auto;" width="80px">
+               </div>
+           </div>
+           <div class="col">
+               <span class="footer-title">Tienda</span>
+               <hr class="footer-hr">
+               <ul>
+                   <li>Nosotros</li>
+                   <li>Contacto</li>
+               </ul>
+           </div>
+   
+           <div class="col">
+               <span class="footer-title">Plantas y Materiales Vegetales</span>
+               <hr class="footer-hr">
+               <ul>
+                   <li>Flores</li>
+                   <li>Arbustos</li>
+                   <li>Árboles</li>
+                   <li>Enredaderas</li>
+                   <li>Césped</li>
+               </ul>
+           </div>
+           <div class="col">
+               <span class="footer-title">Sustratos y abonos</span>
+               <hr class="footer-hr">
+               <ul>
+                   <li>Tierra para macetas</li>
+                   <li>Tierra de hojas</li>
+                   <li>Compost</li>
+                   <li>Fertilizantes (orgánicos e inorgánicos)</li>
+                   <li>Turba</li>
+               </ul>
+           </div>
+           <div class="col">
+               <span class="footer-title">Maceteros y jardineras</span>
+               <hr class="footer-hr">
+               <ul>
+                   <li>Macetas de plástico, barro, cerámica</li>
+                   <li>Jardineras de diferentes materiales</li>
+                   <li>Contenedores elevados</li>
+               </ul>
+           </div>
+           <div class="col">
+               <span class="footer-title">Herramientas de Jardinería</span>
+               <hr class="footer-hr">
+               <ul>
+                   <li>Palas y paletas</li>
+                   <li>Rastrillos</li>
+                   <li>Tijeras de podar</li>
+                   <li>Cuchillos de injerto</li>
+                   <li>Azadas</li>
+               </ul>
+           </div>
+       </div>
+   </footer>
+</body>

@@ -1,0 +1,193 @@
+{% load static %}
+
+<!DOCTYPE html>
+<head>
+
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <script src="https://code.jquery.com/jquery-3.3.1.slim.min.js"></script>
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css">
+    <link rel="stylesheet" href="https://cdn.materialdesignicons.com/5.4.55/css/materialdesignicons.min.css">
+    <link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.15.4/css/all.css">
+    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/js/bootstrap.min.js"></script>
+    <script src="{% static 'js/funciones.js' %}"></script>
+    <link rel="stylesheet" href="{% static 'css/estilos.css' %}">
+    <link rel="icon" type="image/x-icon" href="{% static 'img/favicon.png' %}">
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+    <title>Paraíso Verde | Inicio</title>
+    <style>
+    
+    body {
+                font-family: "Open Sans", sans-serif;
+                height: 100vh;
+                background: url("{% static 'img/fondo.jpg' %}") 50% fixed;
+    
+                background-size: cover;
+            }
+            .carrito-color {
+    color: #007bff; /* Cambia esto por el color que desees para el ícono del carrito */
+}
+
+.carrito-cantidad {
+    background-color: #28a745; /* Cambia esto por el color que desees para el fondo del span */
+    color: #ffffff; /* Cambia esto por el color que desees para el texto dentro del span */
+}
+     </style>
+    <script> 
+        $(document).ready(function() {
+            LlenarNavbar();
+            ObtenerCantidadProductosCarro();
+            $('.nav-link').on('click', function() {
+                // Eliminar la clase active-link de todos los enlaces
+                $('.nav-link').removeClass('active-link');
+                // Añadir la clase active-link al enlace clicado
+                $(this).addClass('active-link');
+            });
+        });
+        </script>
+</head>
+
+<body>
+    <div id="idNavbar"></div>
+    
+
+    <main class="container-fluid">
+        <!-- CAROUSEL -->
+        <div id="carouselExampleFade" class="carousel slide carousel-fade" style="margin-top: 2%;margin-left: 2%;margin-right: 2%;">
+            <div class="carousel-inner">
+                <div class="carousel-item active">
+                    <img src="{% static 'img/carusel1.jpg' %}" class="d-block w-100" alt="...">
+                </div>
+                <div class="carousel-item">
+                    <img src="{% static 'img/carusel2.jpg' %}" class="d-block w-100" alt="...">
+                </div>
+                <div class="carousel-item">
+                    <img src="{% static 'img/carusel3.jpg' %}" class="d-block w-100" alt="...">
+                </div>
+            </div>
+            <button class="carousel-control-prev" type="button" data-target="#carouselExampleFade" data-slide="prev">
+                <span class="carousel-control-prev-icon" aria-hidden="true"></span>
+                <span class="visually-hidden">Previous</span>
+            </button>
+            <button class="carousel-control-next" type="button" data-target="#carouselExampleFade" data-slide="next">
+                <span class="carousel-control-next-icon" aria-hidden="true"></span>
+                <span class="visually-hidden">Next</span>
+            </button>
+        </div>
+
+        <!-- SECCION | SERVICIOS -->
+        <section style="margin-top: 1%;">
+            <h2>SERVICIOS</h2>
+            <div class="card-group d-flex justify-content-between">
+                <!-- CARD 1 -->
+                <div class="card mb-3 custom-card">
+                    <div class="card-body">
+                        <img src="{% static 'img/variedad.jpg' %}" class="card-img-top" alt="...">
+                        <h5 class="card-title">Variedad</h5>
+                        <p class="card-text">Contamos con una diversa variedad de utensilios para todo lo que requiera.</p>
+                    </div>
+                </div>
+        
+                <!-- CARD 2 -->
+                <div class="card mb-3 custom-card">
+                    <div class="card-body">
+                        <img src="{% static 'img/servicio.jpg' %}" class="card-img-top" alt="...">
+                        <h5 class="card-title">Utilidad</h5>
+                        <p class="card-text">Ofrecemos un servicio rápido y eficiente para disfrutar de tu jardín.</p>
+                    </div>
+                </div>
+        
+                <!-- CARD 3 -->
+                <div class="card mb-3 custom-card">
+                    <div class="card-body">
+                        <img src="{% static 'img/entrega.jpg' %}" class="card-img-top" alt="...">
+                        <h5 class="card-title">Entrega</h5>
+                        <p class="card-text">Hacemos entrega a domicilio inmediata de tus pedidos.</p>
+                    </div>
+                </div>
+        
+                <!-- CARD 4 -->
+                <div class="card mb-3 custom-card">
+                    <div class="card-body">
+                        <img src="{% static 'img/atencionP.jpg' %}" class="card-img-top" alt="...">
+                        <h5 class="card-title">Atención Personalizada</h5>
+                        <p class="card-text">Nos dedicamos a brindar una atención cercana y personalizada a cada uno de nuestros clientes, comprendiendo sus necesidades específicas y ofreciendo soluciones a medida para garantizar su completa satisfacción.</p>
+                    </div>
+                </div>
+        
+                <!-- CARD 5 -->
+                <div class="card mb-3 custom-card">
+                    <div class="card-body">
+                        <img src="{% static 'img/experiencia.jpg' %}" class="card-img-top" alt="...">
+                        <h5 class="card-title">Experiencia Profesional</h5>
+                        <p class="card-text">Con años de experiencia en el campo de la jardinería, nuestro equipo profesional está altamente capacitado para ofrecerte servicios de la más alta calidad, asegurando resultados excepcionales en cada proyecto que emprendemos.</p>
+                    </div>
+                </div>
+            </div>
+        </section>
+        
+        
+    </main>
+
+<!--footer-->
+    <footer class="container-fluid navbar-personalizado d-flex align-items-center">
+        <div class="row">
+        <div class="col">
+            <div class="logo-background">
+                <img src="{% static 'img/logoJardineria.png' %}" alt="Logo de Paraiso Verde" style="margin-top: 40px; margin-bottom: auto;" width="80px">
+            </div>
+        </div>
+        <div class="col">
+            <span class="footer-title">Tienda</span>
+            <hr class="footer-hr">
+            <ul>
+                <li>Nosotros</li>
+                <li>Contacto</li>
+            </ul>
+        </div>
+
+        <div class="col">
+            <span class="footer-title">Plantas y Materiales Vegetales</span>
+            <hr class="footer-hr">
+            <ul>
+                <li>Flores</li>
+                <li>Arbustos</li>
+                <li>Árboles</li>
+                <li>Enredaderas</li>
+                <li>Césped</li>
+            </ul>
+        </div>
+        <div class="col">
+            <span class="footer-title">Sustratos y abonos</span>
+            <hr class="footer-hr">
+            <ul>
+                <li>Tierra para macetas</li>
+                <li>Tierra de hojas</li>
+                <li>Compost</li>
+                <li>Fertilizantes (orgánicos e inorgánicos)</li>
+                <li>Turba</li>
+            </ul>
+        </div>
+        <div class="col">
+            <span class="footer-title">Maceteros y jardineras</span>
+            <hr class="footer-hr">
+            <ul>
+                <li>Macetas de plástico, barro, cerámica</li>
+                <li>Jardineras de diferentes materiales</li>
+                <li>Contenedores elevados</li>
+            </ul>
+        </div>
+        <div class="col">
+            <span class="footer-title">Herramientas de Jardinería</span>
+            <hr class="footer-hr">
+            <ul>
+                <li>Palas y paletas</li>
+                <li>Rastrillos</li>
+                <li>Tijeras de podar</li>
+                <li>Cuchillos de injerto</li>
+                <li>Azadas</li>
+            </ul>
+        </div>
+    </div>
+</footer>
+</body>

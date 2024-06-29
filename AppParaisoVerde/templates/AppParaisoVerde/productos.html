@@ -1,0 +1,352 @@
+{% load static %}
+
+<!DOCTYPE html>
+<head>
+
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <script src="https://code.jquery.com/jquery-3.3.1.slim.min.js"></script>
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css">
+    <link rel="stylesheet" href="https://cdn.materialdesignicons.com/5.4.55/css/materialdesignicons.min.css">
+    <link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.15.4/css/all.css">
+    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/js/bootstrap.min.js"></script>
+    <script src="{% static 'js/funciones.js' %}"></script>
+    <link rel="stylesheet" href="{% static 'css/estilos.css' %}">
+    <link rel="icon" type="image/x-icon" href="{% static 'img/favicon.png' %}">
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+    <title>Paraíso Verde | Productos</title>
+    <style>
+    
+        body {
+                font-family: "Open Sans", sans-serif;
+                height: 100vh;
+                background: url("{% static 'img/fondo.jpg' %}") 50% fixed;
+    
+                background-size: cover;
+            }
+        .producto {
+            width: 25%; /* Cada elemento ocupa el 25% del ancho del contenedor padre */
+            box-sizing: border-box; /* Incluye el padding y el borde en el ancho total */
+            padding: 10px; /* Añade espacio alrededor de cada elemento */
+        }
+
+        .producto img {
+            width: 100%; /* Las imágenes ocupan el 100% del ancho del contenedor padre */
+            height: auto; /* La altura se ajusta automáticamente para mantener la relación de aspecto */
+        }
+        .carrito-color {
+            color: #007bff; /* Cambia esto por el color que desees para el ícono del carrito */
+        }
+
+        .carrito-cantidad {
+            background-color: #28a745; /* Cambia esto por el color que desees para el fondo del span */
+            color: #ffffff; /* Cambia esto por el color que desees para el texto dentro del span */
+        }
+     </style>
+    <script> 
+         $(document).ready(function() {
+            LlenarNavbar();
+            buscarProductosComprar();
+            ObtenerCantidadProductosCarro();
+            llenarCmbTipoProducto('cmbTipoProducto');
+            $('.nav-link').on('click', function() {
+                // Eliminar la clase active-link de todos los enlaces
+                $('.nav-link').removeClass('active-link');
+                // Añadir la clase active-link al enlace clicado
+                $(this).addClass('active-link');
+            });
+        });
+    </script>
+</head>
+
+<body>
+    <div id="idNavbar"></div>
+    <div class="container-fluid" style="margin-top: 10px;">
+
+
+        <h1 class="custom-container col-md-4">Tienda de Jardinería</h1>
+        <div class="row">
+            <div class="col-md-3" style="margin-bottom: 10px;">
+                <h2 class="custom-container">Filtros</h2>
+                <form id="filters">
+                    <div class="form-group custom-container">
+                        <label for="genre">Tipo</label>
+                        <select class="form-control" id="cmbTipoProducto">
+                            <option value="0">Todos</option>
+                            <option value="Plantas y Materiales Vegetales">Plantas y Materiales Vegetales</option>
+                            <option value="Sustratos y abonos">Sustratos y abonos</option>
+                            <option value="Maceteros y jardineras">Maceteros y jardineras</option>
+                            <option value="Herramientas de Jardinería">Herramientas de Jardinería</option>
+
+                        </select>
+                    </div>
+                    <div class="form-group custom-container">
+                        <label for="price">Precio Maximo</label>
+                        <input type="text" class="form-control" id="precioProducto">
+                    </div>
+
+                    <div class="form-group custom-container">
+                        <label for="price">Nombre</label>
+                        <input type="text" class="form-control" id="nombreProducto">
+                    </div>
+                    <button type="button" class="btn custom-button" onclick="FiltrarProductos();">Aplicar Filtros</button>
+                </form>
+            </div>
+
+
+            <div class="col-md-9 custom-container-productos" id="listaProductos" style="position: relative; margin-bottom: 20px;">
+                <h2>Productos</h2>
+                             
+                <div id="productList" style="display: flex; flex-wrap: wrap; margin-top: 5px;">
+                    <!-- Género 1 -->
+                    <div class="producto col-md-3" data-tipo="Plantas y Materiales Vegetales" data-precio="20" data-nombre="Rosa">
+                        <img src="imagenes/logoJardineria.png" alt="rosa">
+                        <h3>Rosa</h3>
+                        <p>Tipo: Plantas y Materiales Vegetales</p>
+                        <p>Precio: $20</p>
+                        <input type="number" class="quantity-input cantidad">
+                        <button class="add-to-cart custom-button" onclick="anadirAlCarro(this);">Añadir al carro</button>
+                    </div>
+                    
+                    <div class="producto col-md-3" data-tipo="Plantas y Materiales Vegetales" data-precio="10" data-nombre="Girasol">
+                        <img src="imagenes/logoJardineria.png" alt="abono">
+                        <h3>Girasol</h3>
+                        <p>Tipo: Plantas y Materiales Vegetales</p>
+                        <p>Precio: $10</p>
+                        <input type="number" class="quantity-input cantidad">
+                        <button class="add-to-cart custom-button" onclick="anadirAlCarro(this);">Añadir al carro</button>
+                    </div>
+                    
+                    <div class="producto col-md-3" data-tipo="Plantas y Materiales Vegetales" data-precio="15" data-nombre="Lila">
+                        <img src="imagenes/logoJardineria.png" alt="lila">
+                        <h3>Lila</h3>
+                        <p>Tipo: Plantas y Materiales Vegetales</p>
+                        <p>Precio: $15</p>
+                        <input type="number" class="quantity-input cantidad">
+                        <button class="add-to-cart custom-button" onclick="anadirAlCarro(this);">Añadir al carro</button>
+                    </div>
+                    
+                    <div class="producto col-md-3" data-tipo="Plantas y Materiales Vegetales" data-precio="20" data-nombre="Cesped sintetico">
+                        <img src="imagenes/logoJardineria.png" alt="cesped">
+                        <h3>Cesped sintetico</h3>
+                        <p>Tipo: Plantas y Materiales Vegetales</p>
+                        <p>Precio: $20</p>
+                        <input type="number" class="quantity-input cantidad">
+                        <button class="add-to-cart custom-button" onclick="anadirAlCarro(this);">Añadir al carro</button>
+                    </div>
+                    
+                    <div class="producto col-md-3" data-tipo="Plantas y Materiales Vegetales" data-precio="25" data-nombre="Bonsai">
+                        <img src="imagenes/logoJardineria.png" alt="bonsai">
+                        <h3>Bonsai</h3>
+                        <p>Tipo: Plantas y Materiales Vegetales</p>
+                        <p>Precio: $25</p>
+                        <input type="number" class="quantity-input cantidad">
+                        <button class="add-to-cart custom-button" onclick="anadirAlCarro(this);">Añadir al carro</button>
+                    </div>
+                    <!-- Género 2 -->
+
+
+                    <div class="producto col-md-3" data-tipo="Herramientas de Jardinería" data-precio="20" data-nombre="Pala">
+                        <img src="imagenes/logoJardineria.png" alt="Pala">
+                        <h3>Pala</h3>
+                        <p>Tipo: Herramientas de Jardinería</p>
+                        <p>Precio: $20</p>
+                        <input type="number" class="quantity-input cantidad">
+                        <button class="add-to-cart custom-button" onclick="anadirAlCarro(this);">Añadir al carro</button>
+                    </div>
+                    
+                    <div class="producto col-md-3" data-tipo="Herramientas de Jardinería" data-precio="10" data-nombre="Rastrillo">
+                        <img src="imagenes/logoJardineria.png" alt="Rastrillo">
+                        <h3>Rastrillo</h3>
+                        <p>Tipo: Herramientas de Jardinería</p>
+                        <p>Precio: $10</p>
+                        <input type="number" class="quantity-input cantidad">
+                        <button class="add-to-cart custom-button" onclick="anadirAlCarro(this);">Añadir al carro</button>
+                    </div>
+                    
+                    <div class="producto col-md-3" data-tipo="Herramientas de Jardinería" data-precio="15" data-nombre="Tijeras de podar">
+                        <img src="imagenes/logoJardineria.png" alt="Tijeras de podar">
+                        <h3>Tijeras de podar</h3>
+                        <p>Tipo: Herramientas de Jardinería</p>
+                        <p>Precio: $15</p>
+                        <input type="number" class="quantity-input cantidad">
+                        <button class="add-to-cart custom-button" onclick="anadirAlCarro(this);">Añadir al carro</button>
+                    </div>
+                    
+                    <div class="producto col-md-3" data-tipo="Herramientas de Jardinería" data-precio="20" data-nombre="Cuchillos de injerto">
+                        <img src="imagenes/logoJardineria.png" alt="Cuchillos de injerto">
+                        <h3>Cuchillos de injerto</h3>
+                        <p>Tipo: Herramientas de Jardinería</p>
+                        <p>Precio: $20</p>
+                        <input type="number" class="quantity-input cantidad">
+                        <button class="add-to-cart custom-button" onclick="anadirAlCarro(this);">Añadir al carro</button>
+                    </div>
+                    
+                    <div class="producto col-md-3" data-tipo="Herramientas de Jardinería" data-precio="25" data-nombre="Azadas">
+                        <img src="imagenes/logoJardineria.png" alt="Azadas">
+                        <h3>Azadas</h3>
+                        <p>Tipo: Herramientas de Jardinería</p>
+                        <p>Precio: $25</p>
+                        <input type="number" class="quantity-input cantidad">
+                        <button class="add-to-cart custom-button" onclick="anadirAlCarro(this);">Añadir al carro</button>
+                    </div>
+                    <!-- Género 3 -->
+
+
+                    <div class="producto col-md-3" data-tipo="Sustratos y abonos" data-precio="20" data-nombre="Tierra para macetas">
+                        <img src="imagenes/logoJardineria.png" alt="Tierra para macetas">
+                        <h3>Tierra para macetas</h3>
+                        <p>Tipo: Sustratos y abonos</p>
+                        <p>Precio: $20</p>
+                        <input type="number" class="quantity-input cantidad">
+                        <button class="add-to-cart custom-button" onclick="anadirAlCarro(this);">Añadir al carro</button>
+                    </div>
+                    
+                    <div class="producto col-md-3" data-tipo="Sustratos y abonos" data-precio="10" data-nombre="Tierra de hojas">
+                        <img src="imagenes/logoJardineria.png" alt="Tierra de hojas">
+                        <h3>Tierra de hojas</h3>
+                        <p>Tipo: Sustratos y abonos</p>
+                        <p>Precio: $10</p>
+                        <input type="number" class="quantity-input cantidad">
+                        <button class="add-to-cart custom-button" onclick="anadirAlCarro(this);">Añadir al carro</button>
+                    </div>
+                    
+                    <div class="producto col-md-3" data-tipo="Sustratos y abonos" data-precio="15" data-nombre="Compost">
+                        <img src="imagenes/logoJardineria.png" alt="Compost">
+                        <h3>Compost</h3>
+                        <p>Tipo: Sustratos y abonos</p>
+                        <p>Precio: $15</p>
+                        <input type="number" class="quantity-input cantidad">
+                        <button class="add-to-cart custom-button" onclick="anadirAlCarro(this);">Añadir al carro</button>
+                    </div>
+                    
+                    <div class="producto col-md-3" data-tipo="Sustratos y abonos" data-precio="20" data-nombre="Fertilizante organico">
+                        <img src="imagenes/logoJardineria.png" alt="Fertilizante organico">
+                        <h3>Fertilizante organico</h3>
+                        <p>Tipo: Sustratos y abonos</p>
+                        <p>Precio: $20</p>
+                        <input type="number" class="quantity-input cantidad">
+                        <button class="add-to-cart custom-button" onclick="anadirAlCarro(this);">Añadir al carro</button>
+                    </div>
+                    
+                    <div class="producto col-md-3" data-tipo="Sustratos y abonos" data-precio="25" data-nombre="Turba">
+                        <img src="imagenes/logoJardineria.png" alt="Turba">
+                        <h3>Turba</h3>
+                        <p>Tipo: Sustratos y abonos</p>
+                        <p>Precio: $25</p>
+                        <input type="number" class="quantity-input cantidad">
+                        <button class="add-to-cart custom-button" onclick="anadirAlCarro(this);">Añadir al carro</button>
+                    </div>
+
+                </div>
+            </div>
+
+            <div class="col-md-9 custom-container"  id="Existencias" style="position: relative; display:none; margin-bottom: 10px;">
+                <h2>No existen productos con estos filtros</h2>
+            </div>
+        </div>
+    </div>
+
+
+    <!-- Modal -->
+    <div class="modal fade" id="modal-carro" tabindex="-1" role="dialog" aria-labelledby="myModalLabel"
+        aria-hidden="true">
+        <div class="modal-dialog modal-lg" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="myModalLabel">Carro de Compra</h5>
+                </div>
+                <div class="modal-body">
+                    <div id="existeProducto" style="display: none;">
+                        <h3>No existen productos en el carro</h3>
+                    </div>
+                    <table class="table" id="tablaProductos" style="display: none;">
+                        <thead>
+                            <tr>
+                                <th scope="col">Nombre</th>
+                                <th scope="col">Tipo</th>
+                                <th scope="col">Precio</th>
+                                <th scope="col">Cantidad</th>
+                                <th scope="col">Eliminar</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+
+                        </tbody>
+                    </table>
+                    <div id="valorTotal" style="display: none;">
+                        <h3 id="textoValor">Total a pagar: </h3>
+                    </div>
+
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-dismiss="modal">Cerrar</button>
+                    <button type="button" id="btnComprar" class="btn btn-primary" onclick="ComprarProductos();" style="display: none;">Comprar</button>
+
+                </div>
+            </div>
+        </div>
+    </div>
+
+     <!-- FOOTER -->
+     <footer class="container-fluid navbar-personalizado d-flex align-items-center">
+        <div class="row">
+            <div class="col">
+                <div class="logo-background">
+                    <img src="{% static 'img/logoJardineria.png' %}" alt="Logo de Paraiso Verde" style="margin-top: 40px; margin-bottom: auto;" width="80px">
+                </div>
+            </div>
+            <div class="col">
+                <span class="footer-title">Tienda</span>
+                <hr class="footer-hr">
+                <ul>
+                    <li>Nosotros</li>
+                    <li>Contacto</li>
+                </ul>
+            </div>
+    
+            <div class="col">
+                <span class="footer-title">Plantas y Materiales Vegetales</span>
+                <hr class="footer-hr">
+                <ul>
+                    <li>Flores</li>
+                    <li>Arbustos</li>
+                    <li>Árboles</li>
+                    <li>Enredaderas</li>
+                    <li>Césped</li>
+                </ul>
+            </div>
+            <div class="col">
+                <span class="footer-title">Sustratos y abonos</span>
+                <hr class="footer-hr">
+                <ul>
+                    <li>Tierra para macetas</li>
+                    <li>Tierra de hojas</li>
+                    <li>Compost</li>
+                    <li>Fertilizantes (orgánicos e inorgánicos)</li>
+                    <li>Turba</li>
+                </ul>
+            </div>
+            <div class="col">
+                <span class="footer-title">Maceteros y jardineras</span>
+                <hr class="footer-hr">
+                <ul>
+                    <li>Macetas de plástico, barro, cerámica</li>
+                    <li>Jardineras de diferentes materiales</li>
+                    <li>Contenedores elevados</li>
+                </ul>
+            </div>
+            <div class="col">
+                <span class="footer-title">Herramientas de Jardinería</span>
+                <hr class="footer-hr">
+                <ul>
+                    <li>Palas y paletas</li>
+                    <li>Rastrillos</li>
+                    <li>Tijeras de podar</li>
+                    <li>Cuchillos de injerto</li>
+                    <li>Azadas</li>
+                </ul>
+            </div>
+        </div>
+    </footer>
+</body>

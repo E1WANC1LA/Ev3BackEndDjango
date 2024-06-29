@@ -1,0 +1,101 @@
+{% load static %}
+
+<!DOCTYPE html>
+<head>
+
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <script src="https://code.jquery.com/jquery-3.3.1.slim.min.js"></script>
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css">
+    <link rel="stylesheet" href="https://cdn.materialdesignicons.com/5.4.55/css/materialdesignicons.min.css">
+    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/js/bootstrap.min.js"></script>
+    <script src="{% static 'js/funciones.js' %}"></script>
+    <link rel="stylesheet" href="{% static 'css/estilos.css' %}">
+    <link rel="icon" type="image/x-icon" href="{% static 'img/favicon.png' %}">
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+    <title>Paraíso Verde | Registrarse</title>
+    <style>
+    
+    body {
+                font-family: "Open Sans", sans-serif;
+                height: 100vh;
+                background: url("{% static 'img/fondo.jpg' %}") 50% fixed;
+    
+                background-size: cover;
+            }
+     </style>
+    <script> 
+        $(document).ready(function() {
+            LlenarNavbar();
+
+            $('.nav-link').on('click', function() {
+                // Eliminar la clase active-link de todos los enlaces
+                $('.nav-link').removeClass('active-link');
+                // Añadir la clase active-link al enlace clicado
+                $(this).addClass('active-link');
+            });
+        });
+    </script>
+</head>
+
+<body>
+    <!-- NAVBAR -->
+    <div id="idNavbar"></div>
+
+    <div class="container d-flex justify-content-center" style="width: 100%;">
+        <div class="d-flex align-items-center vh-100 justify-content-center" style="width: 100%;">
+
+            <div class="card" style="width: 60%;">
+                <div class="card-header text-white" style="background-color: #800080;">
+                    <h2 style="color: white;">Registrarse</h2>
+                </div>
+                <div class="card-body">
+                    <form>
+                        <div class="form-group row">
+                            <div class="col">
+                                <label for="nombre">Nombre:</label>
+                                <input type="text" class="form-control" id="nombre" placeholder="Ingrese su nombre">
+                            </div>
+                            <div class="col">
+                                <label for="apellido">Apellido:</label>
+                                <input type="text" class="form-control" id="apellido" placeholder="Ingrese su apellido">
+                            </div>
+                        </div>
+                        <div class="form-group row">
+                            <div class="col">
+                                <label for="telefono">Teléfono:</label>
+                                <input type="number" class="form-control" id="telefono" placeholder="Ingrese su teléfono">
+                            </div>
+                            <div class="col">
+                                <label for="direccion">Dirección:</label>
+                                <input type="text" class="form-control" id="direccion" placeholder="Ingrese su dirección">
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label for="email">Correo electrónico:</label>
+                            <input type="email" class="form-control" id="email"
+                                placeholder="Ingrese su correo electrónico">
+                        </div>
+                        <div class="form-group">
+                            <label for="password">Ingrese su contraseña:</label>
+                            <input type="password" class="form-control" id="password"
+                                placeholder="Ingresa tu contraseña">
+                        </div>
+                        <div class="form-group">
+                            <label for="passwordConfirm">Confirme su contraseña:</label>
+                            <input type="password" class="form-control" id="passwordConfirm"
+                                placeholder="Ingrese nuevamente su contraseña">
+                        </div>
+                        <div class="form-check">
+                            <input type="checkbox" class="form-check-input" id="terms">
+                            <label class="form-check-label" for="terms">Acepto los Términos y Condiciones de
+                                Uso</label>
+                        </div>
+                        <br>
+                        <button type="button" class="btn custom-button" onclick="Registrarse();">Registrarse</button>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</body>

@@ -1,0 +1,126 @@
+.logo-img {
+    width: 100px;
+    height: 100px;
+    object-fit: contain; /* Para mantener la proporción de la imagen */
+}
+.navbar-personalizado {
+    background-color: #d4edda; /* Verde claro */
+    padding-top: 0;
+    padding-bottom: 0;
+}
+.navbar-personalizado .nav-link {
+    color: #800080; /* Lila */
+}
+.navbar-personalizado .nav-link:hover {
+    color: #660066; /* Lila oscuro al pasar el ratón */
+}
+.navbar {
+    min-height: 60px; /* Ajusta esto según sea necesario */
+}
+.navbar-nav .nav-item {
+    margin-bottom: 0; /* Elimina el margen inferior de los elementos del menú */
+}
+.custom-button {
+    background-color: #800080; /* Color de fondo lila */
+    color: #ffffff; /* Color de texto blanco */
+    border: none; /* Sin borde */
+    padding: 10px 20px; /* Relleno del botón */
+    font-size: 16px; /* Tamaño de la fuente */
+    border-radius: 5px; /* Bordes redondeados */
+}
+.custom-button:hover {
+    background-color: #800080; /* Color de fondo lila oscuro al pasar el ratón */
+}
+.active-link {
+    background-color: #ffffff; /* Color amarillo claro para el elemento seleccionado */
+    color: #660066; /* Color del texto negro para el elemento seleccionado */
+}
+.custom-card {
+    background-color: #d4edda; /* Fondo verde claro */
+    max-width: 250px; /* Ancho máximo para todas las cards */
+    margin: 0 10px 20px; /* Margen para separar las cards */
+    border: none; /* Sin borde */
+}
+
+.custom-card .card-body {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+}
+
+.custom-card img {
+    width: 100%; /* La imagen ocupa todo el ancho de la card */
+    object-fit: cover; /* La imagen se ajusta para cubrir la caja */
+}
+
+.custom-card .card-title,
+.custom-card .card-text {
+    text-align: center; /* El texto está centrado */
+    margin-top: 10px; /* Separación entre la imagen y el texto */
+}
+.custom-card .card-img-top {
+    width: 100%; /* Ajustar el ancho al 100% del contenedor */
+    height: 200px; /* Establecer una altura fija */
+    object-fit: cover; /* Escalar la imagen para cubrir */
+}
+
+.carousel-control-prev,
+.carousel-control-next {
+    border: none;
+    width: auto;
+    color: rgba(255, 255, 255, 0.2); /* Color casi transparente */
+    transition: color 0.3s ease; /* Transición suave del color */
+}
+
+.carousel-control-prev:hover,
+.carousel-control-next:hover {
+    color: rgba(255, 255, 255, 0.8); /* Color más visible al pasar el cursor */
+}
+
+.carousel-item img {
+    width: 100%; /* Ajustar el ancho al 100% del contenedor */
+    height: 400px; /* Establecer una altura fija */
+    object-fit: cover; /* Escalar la imagen para cubrir */
+}
+.custom-container {
+    background-color: #d3f7d1; /* Color verde claro */
+    padding: 20px; /* Espaciado interno para que el contenido no esté pegado al borde */
+    border-radius: 10px; /* Borde redondeado */
+}
+
+
+
+.custom-container-productos {
+    background-color: #d3f7d1; /* Color de fondo verde claro */
+    padding: 20px; /* Espaciado interno */
+    border-radius: 10px; /* Borde redondeado */
+}
+
+.producto {
+    margin-bottom: 20px; /* Espaciado entre los libros */
+}
+
+.producto h3, .producto p {
+    margin: 5px 0; /* Espaciado para los títulos y párrafos dentro del libro */
+}
+
+.quantity-input {
+    width: 50px; /* Ancho del campo de entrada para la cantidad */
+}
+
+.add-to-cart {
+    border: 1px solid; /* Borde con color verde */
+    padding: 5px 10px; /* Espaciado interno del botón */
+    cursor: pointer; /* Cursor de apuntar */
+    transition: background-color 0.3s, color 0.3s; /* Transición suave */
+}
+
+.add-to-cart:hover {
+    color: white; /* Cambio de color de texto al pasar el mouse */
+}
+
+.opcion-navbar {
+    background-color: #800080 !important; /* Color de fondo */
+    color: #ffffff !important; /* Color del texto */
+    margin-bottom: 10px !important; /* Margen inferior */
+}

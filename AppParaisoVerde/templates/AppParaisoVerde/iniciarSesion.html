@@ -1,0 +1,81 @@
+{% load static %}
+
+<!DOCTYPE html>
+<head>
+
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <script src="https://code.jquery.com/jquery-3.3.1.slim.min.js"></script>
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css">
+    <link rel="stylesheet" href="https://cdn.materialdesignicons.com/5.4.55/css/materialdesignicons.min.css">
+    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/js/bootstrap.min.js"></script>
+    <script src="{% static 'js/funciones.js' %}"></script>
+    <link rel="stylesheet" href="{% static 'css/estilos.css' %}">
+    <link rel="icon" type="image/x-icon" href="{% static 'img/favicon.png' %}">
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+    <title>Paraiso Verde | Iniciar sesión</title>
+
+ <style>
+    
+    body {
+                font-family: "Open Sans", sans-serif;
+                height: 100vh;
+                background: url("{% static 'img/fondo.jpg' %}") 50% fixed;
+    
+                background-size: cover;
+            }
+    
+ </style>
+    <script> 
+       $(document).ready(function() {
+            LlenarNavbar();
+            
+            $('.nav-link').on('click', function() {
+                // Eliminar la clase active-link de todos los enlaces
+                $('.nav-link').removeClass('active-link');
+                // Añadir la clase active-link al enlace clicado
+                $(this).addClass('active-link');
+            });
+        });
+    </script>
+</head>
+
+<body>
+    <div id="idNavbar"></div>
+    
+
+    <div class="container d-flex justify-content-center" style="width: 100%;">
+        <div class="d-flex align-items-center vh-100 justify-content-center" style="width: 100%;">
+
+            <div class="card" style="width: 60%;">
+                <div class="card-header text-white" style="background-color: #800080;">
+                    <h2 style="color: white;">Iniciar sesión</h2>
+                </div>
+                <div class="card-body">
+                    <form>
+                        <div class="row">
+                             <div class="form-group col-9">
+                                    <label for="email">Correo electrónico:</label>
+                                    <input type="email" class="form-control" id="email" required>
+                                </div>
+                                <div class="form-group col-3">
+                                    <button type="button" class="btn custom-button" id="btnAdmin" onclick="RellenarUsuario('ADMIN@ADMIN.CL','1234');">Usuario Admin</button>
+                                </div>
+                         </div>
+                         <div class="row">
+                                <div class="form-group col-9">
+                                    <label for="password">Contraseña:</label>
+                                    <input type="password" class="form-control" id="password" required>
+                                </div>
+                                
+                                <div class="form-group col-3">
+                                    <button type="button" class="btn custom-button" id="btnCliente" onclick="RellenarUsuario('CLIENTE@CLIENTE.CL','1234');">Usuario Cliente</button>
+                                </div>
+                         </div>
+                        <button type="button" class="btn custom-button" onclick="IniciarSesion()">Iniciar</button>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</body>
