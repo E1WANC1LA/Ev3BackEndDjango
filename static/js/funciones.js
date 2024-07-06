@@ -2,6 +2,8 @@ var GL_ID_TIPO_USUARIO=0;
 var GL_ID_TIPO_PRODUCTO=0;
 var GL_ID_USUARIO=0;
 var GL_ID_PRODUCTO=0;
+var GL_ID_SUSCRIPCION=0;
+var GL_SUSCRITO=false;
 
 function LlenarNavbar(){
     var navbarHtml='';
@@ -1237,10 +1239,11 @@ function buscarProductosCarrito(){
                         var cellCantidad = document.createElement("td");
                         var cellAcciones = document.createElement("td");
 
+                        
                         cellNombre.className = 'nombreProducto';
                         cellNombre.value = producto.id_producto;
                         cellImagen.innerHTML = '<img src="../../static/img/'+producto.imagen_nombre+'" alt="Imagen del producto" class="img-fluid imagen-carrito">';
-                        cellNombre.innerHTML = producto.nombre;
+                        cellNombre.innerHTML = '<h4 class="idProducto" value="'+producto.id_producto+'">'+producto.nombre+'</h4>';
                         cellPrecio.className = 'precioProducto';
                         cellPrecio.innerHTML = producto.precio_unitario.split('.')[0];
                         cellDescripcion.innerHTML = producto.descripcion;
@@ -1267,6 +1270,8 @@ function buscarProductosCarrito(){
 
                     cellTotal.innerHTML = '<h4>Total: <span id="totalCarrito"></span></h4>';
                     cellComprar.innerHTML = '<button class="btn custom-button" onclick="ComprarCarrito();">Comprar</button>';
+                    cellTotal.className = 'totalCarrito';
+                    filaFinal.className = 'filaComprarCarrito';
 
                     filaFinal.appendChild(cellRelleno);
                     filaFinal.appendChild(cellRelleno2);
@@ -1274,7 +1279,54 @@ function buscarProductosCarrito(){
                     filaFinal.appendChild(cellRelleno4);
                     filaFinal.appendChild(cellTotal);
                     filaFinal.appendChild(cellComprar);
+                    
+                    var filaFinal2 = document.createElement("tr");
+                    var cellDescuento = document.createElement("td");
+                    var cellRelleno5 = document.createElement("td");
+                    var cellRelleno6 = document.createElement("td");
+                    var cellRelleno7 = document.createElement("td");
+                    var cellRelleno8 = document.createElement("td");
+                    var cellRellenoInvisible = document.createElement("td");
 
+                    filaFinal2.className = 'filaDescuentoCarrito';
+
+                    cellRellenoInvisible.style.display = 'none';
+
+
+                    cellDescuento.innerHTML = '<h4>Descuento: <span id="DescuentoCarrito"></span></h4>';
+                    cellDescuento.className = 'descuentoCarrito';
+                    filaFinal2.appendChild(cellRelleno5);
+                    filaFinal2.appendChild(cellRelleno6);
+                    filaFinal2.appendChild(cellRelleno7);
+                    filaFinal2.appendChild(cellRelleno8);
+                    filaFinal2.appendChild(cellDescuento);
+                    filaFinal2.appendChild(cellRellenoInvisible);
+                    
+
+
+                    var filaFinal3 = document.createElement("tr");
+                    var cellSuscrito = document.createElement("td");
+                    var cellRelleno9 = document.createElement("td");
+                    var cellRelleno10 = document.createElement("td");
+                    var cellRelleno11 = document.createElement("td");
+                    var cellRelleno12 = document.createElement("td");
+                    var cellRellenoInvisible2 = document.createElement("td");
+
+                    filaFinal3.className = 'filaSuscritoCarrito';
+
+                    cellRellenoInvisible2.style.display = 'none';
+                    cellSuscrito.innerHTML = '<h4>Suscrito: <span id="Suscrito"></span></h4>';
+                    cellSuscrito.className = 'suscritoCarrito';
+                    filaFinal3.appendChild(cellRelleno9);
+                    filaFinal3.appendChild(cellRelleno10);
+                    filaFinal3.appendChild(cellRelleno11);
+                    filaFinal3.appendChild(cellRelleno12);
+                    filaFinal3.appendChild(cellSuscrito);
+                    filaFinal3.appendChild(cellRellenoInvisible2);
+                    
+
+                    tabla.append(filaFinal3);
+                    tabla.append(filaFinal2);
                     tabla.append(filaFinal);
                     actualizarPrecioCarrito();
                 }
@@ -1286,6 +1338,259 @@ function buscarProductosCarrito(){
         error: function (XMLHttpRequest, text, error) { ; alert(XMLHttpRequest.responseText); },
         failure: function (response) { alert(response); }
     });
+}
+
+
+
+function ComprarCarrito(){
+    console.log('entre comprar');
+
+    var fd = new FormData();
+    var total = 0;
+    var arrayProductos = [];
+    $("#tablaProductosCarrito tbody tr").each(function() {
+        if ($(this).hasClass('filaComprarCarrito')) 
+        {
+            console.log('entre fila compra');
+            fd.append('Total', $(this).find('.totalCarrito').find('h4').find('span').text().substring(1));
+        }
+        else if ($(this).hasClass('filaDescuentoCarrito')) 
+        {
+            console.log('entre fila descuento');
+           fd.append('Descontado', $(this).find('.descuentoCarrito').find('h4').find('span').text().substring(1));
+        }
+        else if ($(this).hasClass('filaSuscritoCarrito')) 
+        {
+            console.log('entre fila suscrito');
+            $(this).find('.suscritoCarrito').find('h4').find('span').text() == 'Suscrito' ? fd.append('Suscrito','si') : fd.append('Suscrito','no');
+        }
+        else
+        {
+        console.log('entre fila producto');
+        var id_producto = $(this).find('.idProducto').attr('value');
+        var cantidad = $(this).find('.cantidadProducto').val();
+        var precio = $(this).find('.precioProducto').text();       
+        precio = parseInt(precio) * parseInt(cantidad); 
+        arrayProductos.push({id_producto: id_producto, cantidad: cantidad, precio: precio});
+        }
+    });
+    console.log(arrayProductos);
+    console.log(JSON.stringify(arrayProductos));
+    fd.append('Productos', JSON.stringify(arrayProductos));
+    fd.append('EstadoDespacho', 'Preparando envío');
+
+
+    $.ajax({
+        type: "POST",
+        url: "/ComprarCarrito/",
+        data: fd,
+        contentType: false,
+        processData: false,
+        headers: { "X-CSRFToken": getCookie("csrftoken") },
+        success: function (response) {
+            if (response.estado == 'completado') {
+                alert('Compra realizada con éxito');
+                window.location.href = '/MiPerfil/';
+            } else {
+                alert('Falló la compra');
+            }
+        },
+        error: function (XMLHttpRequest, text, error) { ; alert(XMLHttpRequest.responseText); },
+        failure: function (response) { alert(response); }
+    });
+
+}
+
+
+function CancelarSuscripcion(){
+    var fd = new FormData();
+    $.ajax({
+        type: "POST",
+        url: "/CancelarSuscripcion/",
+        data: fd,
+        contentType: false,
+        processData: false,
+        headers: { "X-CSRFToken": getCookie("csrftoken") },
+        success: function (response) {
+            if (response.estado == 'completado') {
+                alert('Suscripción cancelada con éxito');
+                GL_SUSCRITO = false;
+                PrepararBotonSuscripcion();
+                buscarProductosCarrito();
+            } else {
+                alert('Falló la cancelación de la suscripción');
+            }
+        },
+        error: function (XMLHttpRequest, text, error) { ; alert(XMLHttpRequest.responseText); },
+        failure: function (response) { alert(response); }
+    });
+
+}
+
+function BuscarInformacionUsuario(){
+    var fd = new FormData();
+    $.ajax({
+        type: "POST",
+        url: "/BuscarInformacionUsuario/",
+        data: fd,
+        contentType: false,
+        processData: false,
+        headers: { "X-CSRFToken": getCookie("csrftoken") },
+        success: function (response) {
+            console.log(response);
+            if (response.estado == 'completado') {
+                $('#nombre').val(response.datos.nombre.split(' ')[0]);
+                $('#apellido').val(response.datos.nombre.split(' ')[1]);
+                $('#email').val(response.datos.correo);
+                $('#telefono').val(response.datos.telefono);
+                $('#direccion').val(response.datos.direccion);
+                PrepararBotonSuscripcion();
+            } else {
+                alert('Falló la busqueda de la información del usuario');
+            }
+        },
+        error: function (XMLHttpRequest, text, error) { ; alert(XMLHttpRequest.responseText); },
+        failure: function (response) { alert(response); }
+    });
+
+}
+
+
+function BuscarMisCompras(){
+    var fd = new FormData();
+    $('#tablaMisCompras tbody').empty();
+    $('#divMensajeNoEncontradoMisCompras').hide();
+    $.ajax({
+        type: "POST",
+        url: "/BuscarMisCompras/",
+        data: fd,
+        contentType: false,
+        processData: false,
+        headers: { "X-CSRFToken": getCookie("csrftoken") },
+        success: function (response) {
+            console.log(response);
+            if (response.estado == 'sin compras') {
+                $('#divMisCompras').hide();
+                $('#divSinCompras').show();
+                return;
+            }
+            if(response.estado === 'completado') {
+                var tabla = $('#tablaMisCompras');
+                $('#divMisCompras').show();
+                $.each(response.datos, function(i, compra) {
+                    var FilaDatos = document.createElement("tr");
+
+                    var cellNumero = document.createElement("td");
+                    var cellFecha = document.createElement("td");
+                    var cellDescuento = document.createElement("td");
+                    var cellTotal = document.createElement("td");
+                    var cellEstado = document.createElement("td");
+                    var cellAcciones = document.createElement("td");
+
+                    cellNumero.innerHTML = compra.id_compra;
+                    cellDescuento.innerHTML = compra.descontado;
+                    cellFecha.innerHTML = compra.fecha_compra;
+                    cellTotal.innerHTML = compra.total;
+                    cellEstado.innerHTML = compra.estado_despacho;
+                    cellAcciones.innerHTML = '<button class="btn custom-button" onclick="ImprimirDetalleCompra('+compra.id_compra+');">Imprimir detalle</button>';
+
+                    FilaDatos.appendChild(cellNumero);
+                    FilaDatos.appendChild(cellFecha);
+                    FilaDatos.appendChild(cellDescuento);
+                    FilaDatos.appendChild(cellTotal);
+                    FilaDatos.appendChild(cellEstado);
+                    FilaDatos.appendChild(cellAcciones);
+
+                    tabla.append(FilaDatos);
+                });
+            }
+            else {
+                alert('Falló la busqueda de las compras');
+            }
+        },
+        error: function (XMLHttpRequest, text, error) { ; alert(XMLHttpRequest.responseText); },
+        failure: function (response) { alert(response); }
+    });
+}
+
+
+
+function ImprimirDetalleCompra(id_compra) {
+    var fd = new FormData();
+    fd.append("IdCompra", id_compra);
+    $.ajax({
+        type: "POST",
+        url: "/ImprimirDetalleCompra/",
+        data: fd,
+        contentType: false,
+        processData: false,
+        xhrFields: {
+            responseType: 'blob'  // Añade esta línea para manejar la respuesta como un blob
+        },
+        headers: { "X-CSRFToken": getCookie("csrftoken") },
+        success: function (response) {
+            if (response.Excepciones != null) {
+                console.log(response.Excepciones.message + '\n' + response.Excepciones.type + '\n' + response.Excepciones.details);
+                alert('No se encontró el detalle de la compra');
+                return;
+            }
+            var fileURL = URL.createObjectURL(response);
+            var a = document.createElement('a');
+            a.href = fileURL;
+            a.download = 'detalle_compra.pdf';
+            document.body.appendChild(a); 
+            a.click(); 
+            document.body.removeChild(a); 
+        },
+        error: function (XMLHttpRequest, text, error) { 
+            alert(XMLHttpRequest.responseText); 
+        },
+        failure: function (response) { 
+            alert(response); 
+        }
+    });
+}
+
+
+
+function Suscribirse(){
+    var fd = new FormData();
+    $.ajax({
+        type: "POST",
+        url: "/Suscribirse/",
+        data: fd,
+        contentType: false,
+        processData: false,
+        headers: { "X-CSRFToken": getCookie("csrftoken") },
+        success: function (response) {
+            if (response.estado == 'completado') {
+                alert('Suscripción realizada con éxito');
+                GL_SUSCRITO = true;
+                PrepararBotonSuscripcion();
+                buscarProductosCarrito();
+            } else {
+                alert('Falló la suscripción');
+            }
+        },
+        error: function (XMLHttpRequest, text, error) { ; alert(XMLHttpRequest.responseText); },
+        failure: function (response) { alert(response); }
+    });
+
+}
+
+
+function PrepararBotonSuscripcion(){
+
+    if (GL_SUSCRITO == true) {
+        $('#labelbtnCambiarSuscripcion').text('Cancelar suscripción');
+        $('#btnCambiarSuscripcion').text('Cancelar suscripción');
+        $('#btnCambiarSuscripcion').attr('onclick','CancelarSuscripcion();');
+    } else {
+        $('#labelbtnCambiarSuscripcion').text('Suscribirse');
+        $('#btnCambiarSuscripcion').text('Suscribirse');
+        $('#btnCambiarSuscripcion').attr('onclick','Suscribirse();');
+    }
+
 }
 
 
@@ -1329,6 +1634,15 @@ function actualizarPrecioCarrito(){
         total = total + (precio * cantidad);
     });
     $('#totalCarrito').text("$"+total);
+    $('#Suscrito').text("No Suscrito");
+    $('#DescuentoCarrito').text("Sin descuento");
+    if (GL_SUSCRITO == true) {
+        var descuento = total * 0.1;
+        total = total * 0.9;
+        $('#totalCarrito').text("$"+total);
+        $('#Suscrito').text("Suscrito");
+        $('#DescuentoCarrito').text("$"+descuento);
+    }
 
 }
 
@@ -1691,6 +2005,291 @@ function RegistrarUsuario() {
 
 
 }
+
+function PrepararModalAgregarSuscripcion(){
+    $('#AddFechaInicioSuscripcion').val('');
+    $('#AddFechaFinSuscripcion').val('');
+    llenarCmbUsuario('cboAddUsuariosSuscripcion');
+}
+
+function AgregarSuscripcion(){
+    var msg = '';
+    var fechaInicio = $('#AddFechaInicioSuscripcion').val();
+    var fechaFin = $('#AddFechaFinSuscripcion').val();
+    var usuario = $('#cboAddUsuariosSuscripcion').val();
+    if (fechaInicio.toString() === '' || fechaFin.toString() === '' || usuario.toString() === '') {
+        msg = msg + '\nPor favor, rellene todos los campos.';
+    }
+    if (parseInt(usuario) === 0) {
+        msg = msg + '\nPor favor, seleccione un usuario.';
+    }
+    var inicio = new Date(fechaInicio);
+    var fin = new Date(fechaFin);
+
+    if (inicio > fin) {
+        msg = msg + '\nLa fecha de inicio no puede ser mayor a la fecha de fin.';
+    }
+
+    if (msg != '') {
+        alert(msg);
+        return;
+    }
+
+    var fd = new FormData();
+    fd.append("FechaInicio", fechaInicio);
+    fd.append("FechaFin", fechaFin);
+    fd.append("Usuario", usuario);
+
+    $.ajax({
+        type: "POST",
+        url: "/AdminCrearSuscripcion/",
+        data: fd,
+        contentType: false,
+        processData: false,
+        headers: { "X-CSRFToken": getCookie("csrftoken") },
+        success: function (response) {
+            console.log(response);
+            if (response.Excepciones != null) {
+                alert('Ha ocurrido un error inesperado');
+                console.log(response.Excepciones.message + '\n' + response.Excepciones.type + '\n' + response.Excepciones.details);
+                return;
+            }
+            if (response.error != null) {
+                alert(response.error);
+                return;
+            }
+            if(response.estado === 'completado') {
+                alert('Suscripcion creada con éxito');
+                $('#modal-agregarSuscripcion').modal('hide');
+                BuscarSuscripciones();
+            } else {
+                alert('Falló la creación de la suscripcion');
+            }
+
+        },
+        error: function (XMLHttpRequest, text, error) { ; alert(XMLHttpRequest.responseText); },
+        failure: function (response) { alert(response); }
+    });
+}
+
+
+function BuscarSuscripciones(){
+    var fd = new FormData();
+    var fechaInicio = $('#BusFechaInicioSuscripcion').val();
+    var fechaFin = $('#BusFechaFinSuscripcion').val();
+    var usuario = $('#cmbSuscripcionBusUsuario').val();
+    if (fechaInicio.toString() === '') {
+        fechaInicio = '1900-01-01';
+    }
+    if (fechaFin.toString() === '') {
+        fechaFin = '9999-12-31';
+    }
+    if (usuario == 0 || usuario == null) {
+        usuario = '0';
+    }
+    fd.append("FechaInicio", fechaInicio);
+    fd.append("FechaFin", fechaFin);
+    fd.append("Usuario", usuario);
+    $('#tablaSuscripciones tbody').empty();
+    $('#divMensajeNoEncontradoSuscripciones').hide();
+
+    $.ajax({
+        type: "POST",
+        url: "/AdminBuscarSuscripciones/",
+        data: fd,
+        contentType: false,
+        processData: false,
+        headers: { "X-CSRFToken": getCookie("csrftoken") },
+        success: function (response) {
+            console.log(response);
+            if (response.Excepciones != null) {
+                alert('Ha ocurrido un error inesperado');
+                console.log(response.Excepciones.message + '\n' + response.Excepciones.type + '\n' + response.Excepciones.details);
+                return;
+            }
+            if(response.estado === 'completado') {
+                var tabla = $('#tablaSuscripciones');
+                if (response.datos.length == 0) {
+                    $('#tablaSuscripciones').parent().parent().parent().parent().hide();
+                    $('#divMensajeNoEncontradoSuscripciones').show();
+                    return;
+                }
+                $('#tablaSuscripciones').parent().parent().parent().parent().show();
+                $.each(response.datos, function(i, suscripcion) {
+                    var FilaDatos = document.createElement("tr");
+
+                    var cellId = document.createElement("td");
+                    var cellFechaInicio = document.createElement("td");
+                    var cellFechaFin = document.createElement("td");
+                    var cellUsuario = document.createElement("td");
+                    var cellAcciones = document.createElement("td");
+                    let fechaIsoInicio = suscripcion.fecha_inicio_suscripcion;
+                    fechaIsoInicio = fechaIsoInicio.split('T')[0];
+
+                    let diaInicio = fechaIsoInicio.split('-')[2];
+                    let mesInicio = fechaIsoInicio.split('-')[1];
+                    let añoInicio = fechaIsoInicio.split('-')[0];
+
+                    let fechaFormateadaInicio = `${diaInicio}/${mesInicio}/${añoInicio}`;
+                    
+                    let fechaIsoFin = suscripcion.fecha_fin_suscripcion;
+                    fechaIsoFin = fechaIsoFin.split('T')[0];
+
+                    let diaFin = fechaIsoFin.split('-')[2];
+                    let mesFin = fechaIsoFin.split('-')[1];
+                    let añoFin = fechaIsoFin.split('-')[0];
+
+
+                    let fechaFormateadaFin = `${diaFin}/${mesFin}/${añoFin}`;
+
+
+                    cellId.innerHTML = suscripcion.id_suscripcion;
+                    cellFechaInicio.innerHTML = fechaFormateadaInicio;
+                    cellFechaFin.innerHTML = fechaFormateadaFin;
+                    cellUsuario.innerHTML = suscripcion.usuario_nombre;
+                    cellAcciones.innerHTML = '<button class="btn" onclick="EliminarSuscripcion('+suscripcion.id_suscripcion+');"><i class="mdi mdi-trash-can-outline"></i></button>';
+
+                    FilaDatos.appendChild(cellUsuario);
+                    FilaDatos.appendChild(cellFechaInicio);
+                    FilaDatos.appendChild(cellFechaFin);
+                    FilaDatos.appendChild(cellAcciones);
+
+                    tabla.append(FilaDatos);
+                });
+
+            } else {
+                alert('Falló la busqueda de suscripciones');
+            }
+
+        },
+        error: function (XMLHttpRequest, text, error) { ; alert(XMLHttpRequest.responseText); },
+        failure: function (response) { alert(response); }
+    });
+}
+
+
+function UsuarioSuscrito(){
+    return new Promise((resolve, reject) => {
+
+        var fd = new FormData();
+     $.ajax({
+        type: "POST",
+        url: "/UsuarioSuscrito/",
+        data: fd,
+        contentType: false,
+        processData: false,
+        headers: { "X-CSRFToken": getCookie("csrftoken") },
+        success: function (response) {
+            if (response.Excepciones != null) {
+                alert('Ha ocurrido un error inesperado');
+                console.log(response.Excepciones.message + '\n' + response.Excepciones.type + '\n' + response.Excepciones.details);
+                reject();
+                return;
+
+            }
+            if (response.error != null) {
+                alert(response.error);
+                reject();
+                return;
+            }
+            if (response.estado == 'completado' && response.datos == 'existe') {
+                resolve();
+                GL_SUSCRITO = true;
+            } else if (response.estado == 'completado' && response.datos == 'no existe')
+            {
+                GL_SUSCRITO = false;
+                resolve();
+            }
+        },
+        error: function (XMLHttpRequest, text, error) { ; alert(XMLHttpRequest.responseText); 
+            reject();
+        },
+        failure: function (response) { alert(response);
+            reject();
+         }
+      });
+
+    });
+}
+
+
+function EliminarSuscripcion(id_suscripcion){
+    GL_ID_SUSCRIPCION = id_suscripcion;
+    $('#modal-confirmaEliminarSuscripcion').modal('show');
+    $('#idMensajeEliminarSuscripcion').html('¿Está seguro que desea eliminar la suscripcion?');
+}
+
+function EliminaSuscripcion(){
+    var fd = new FormData();
+    fd.append("IdSuscripcion", GL_ID_SUSCRIPCION);
+    $.ajax({
+        type: "POST",
+        url: "/AdminEliminarSuscripcion/",
+        data: fd,
+        contentType: false,
+        processData: false,
+        headers: { "X-CSRFToken": getCookie("csrftoken") },
+        success: function (response) {
+            console.log(response);
+            if (response.estado == 'completado') {
+                alert('Suscripcion eliminada con éxito');
+                BuscarSuscripciones();
+            } else {
+                alert('Falló la eliminación de la suscripcion');
+            }
+        },
+        error: function (XMLHttpRequest, text, error) { ; alert(XMLHttpRequest.responseText); },
+        failure: function (response) { alert(response); }
+    });
+
+}
+
+
+function llenarCmbUsuario(cmb){
+    return new Promise((resolve, reject) => {
+
+        var fd = new FormData();
+        $.ajax({
+            type: "POST",
+            url: "/AdminBuscarUsuariosCMB/",
+            data: fd,
+            contentType: false,
+            processData: false,
+            headers: { "X-CSRFToken": getCookie("csrftoken") },
+            success: function (response) {
+                console.log(response);
+                if (response.Excepciones != null) {
+                    alert('Ha ocurrido un error inesperado');
+                    console.log(response.Excepciones.message + '\n' + response.Excepciones.type + '\n' + response.Excepciones.details);
+                    reject();
+                    return;
+                }
+                if(response.estado === 'completado') {
+                    $('#'+cmb.toString()+'').empty();
+                    $('#'+cmb.toString()+'').append('<option value="0">Seleccione un usuario</option>');
+                    $.each(response.datos, function(i, usuario) {
+                        $('#'+cmb.toString()+'').append('<option value="'+usuario.id_usuario+'">'+usuario.nombre+'</option>');
+                    });
+                    resolve();
+            
+                }
+                else {
+                    alert('Falló la recuperacion del usuario');
+                    reject();
+                }
+
+            },
+            error: function (XMLHttpRequest, text, error) { ; alert(XMLHttpRequest.responseText);
+                reject();
+                },
+            failure: function (response) { alert(response);
+                reject();
+            }
+        });
+    });
+
+}
+
 function Registrarse() {
     var msg = '';
     var nombre = $('#nombre').val();
@@ -1813,33 +2412,10 @@ function mostrarDiv(div,tabla){
         buscarTipoProducto();
     }
     if (div.toString() === 'DivSuscripcionVigente') {
-        alert('Este Mantenedor no esta terminado, por favor cambiar de mantenedor');
-        $('#DivSuscripcionVigente').hide();
-        // buscarSuscripciones();
+        llenarCmbUsuario('cmbSuscripcionBusUsuario');
+        BuscarSuscripciones();
     }
     
 }
 
 
-function ComprarCarrito(){
-    var fd = new FormData();
-    $.ajax({
-        type: "POST",
-        url: "/ComprarCarrito/",
-        data: fd,
-        contentType: false,
-        processData: false,
-        headers: { "X-CSRFToken": getCookie("csrftoken") },
-        success: function (response) {
-            if (response.estado == 'completado') {
-                alert('Compra realizada con éxito');
-                window.location.href = '/';
-            } else {
-                alert('Falló la compra');
-            }
-        },
-        error: function (XMLHttpRequest, text, error) { ; alert(XMLHttpRequest.responseText); },
-        failure: function (response) { alert(response); }
-    });
-
-}

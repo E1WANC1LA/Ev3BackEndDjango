@@ -839,33 +839,28 @@
                             <h4 class="card-title">Filtros</h4>
                             <div class="form-body">
                                 <div class="row p-t-20">
+                                
                                     <div class="col-md-6">
                                         <div class="form-group">
-                                            <label class="control-label">Familia</label>
-                                            <select class="form-control custom-select" id="cboFamiliaBus">
-                                        
+                                            <label class="control-label">Usuario</label>
+                                            <select class="form-control custom-select" id="cmbSuscripcionBusUsuario">
                                             </select>
                                         </div>
                                     </div>
-                                    <div class="col-md-6">
-                                        <div class="form-group">
-                                            <label class="control-label">Sub Familia</label>
-                                            <select class="form-control custom-select" id="cboSubFamiliaBus">
-                                            </select>
-                                        </div>
-                                    </div>
+                                   
                                 </div>
                                 <div class="row">
+                                
                                     <div class="col-md-6">
                                         <div class="form-group">
-                                            <label class="control-label">Código</label>
-                                            <input type="text" class="form-control" id="CodigoBus">
+                                            <label class="control-label">Fecha Inicio:</label>
+                                            <input type="date" class="form-control" id="BusFechaInicioSuscripcion">
                                         </div>
                                     </div>
                                     <div class="col-md-6">
                                         <div class="form-group">
-                                            <label class="control-label">Nombre</label>
-                                            <input type="text" class="form-control" id="NombreBus">
+                                            <label class="control-label">Fecha Fin:</label>
+                                            <input type="date" class="form-control" id="BusFechaFinSuscripcion">
                                         </div>
                                     </div>
                                 </div>
@@ -890,64 +885,23 @@
                                             <div class="row">
                                                 <div class="col-md-6">
                                                     <div class="form-group">
-                                                        <label for="AddRut" class="control-label">Familia:</label>
-                                                        <select class="form-control custom-select" id="cboFamiliaAdd">
-                                                        </select>
-                                                    </div>
-                                                </div>
-                                                <div class="col-md-6">
-                                                    <div class="form-group">
-                                                        <label for="AddNombres" class="control-label">Sub
-                                                            Familia:</label>
-                                                        <select class="form-control custom-select"
-                                                            id="cboSubFamiliaAdd">
+                                                        <label for="AddRut" class="control-label">Usuario:</label>
+                                                        <select class="form-control custom-select" id="cboAddUsuariosSuscripcion">
                                                         </select>
                                                     </div>
                                                 </div>
                                             </div>
-                                            <div class="row" style="display: none;">
-                                                <div class="col-md-6">
-                                                    <div class="form-group">
-                                                        <label for="AddAppPat" class="control-label">Código
-                                                            genérico:</label>
-                                                        <input type="text" class="form-control" id="CodigoAdd">
-                                                    </div>
-                                                </div>
-                                            </div>
-                                            <div class="row">
-                                                <div class="col-12">
-                                                    <div class="form-group">
-                                                        <label for="AddAppMat" class="control-label">Nombre:</label>
-                                                        <input type="text" class="form-control" id="NombreAdd">
-                                                    </div>
-                                                </div>
-                                            </div>
-                                            <div class="row">
-                                                <div class="col-12">
-                                                    <div class="form-group">
-                                                        <label for="AddTelefono"
-                                                            class="control-label">Descripción:</label>
-                                                        <input type="text" class="form-control" id="DescripcionAdd">
-                                                    </div>
-                                                </div>
-                                            </div>
                                             <div class="row">
                                                 <div class="col-md-6">
                                                     <div class="form-group">
-                                                        <div class="form-group">
-                                                            <label for="AddNombres" class="control-label">Unidad de
-                                                                Medida:</label>
-                                                            <select class="form-control custom-select"
-                                                                id="cboUnidadMedidaAdd">   
-                                                            </select>
-                                                        </div>
-
+                                                        <label class="control-label">Fecha Inicio:</label>
+                                                        <input type="date" class="form-control" id="AddFechaInicioSuscripcion">
                                                     </div>
                                                 </div>
                                                 <div class="col-md-6">
                                                     <div class="form-group">
-                                                        <label for="AddEmail" class="control-label">Precio:</label>
-                                                        <input type="text" class="form-control" id="PrecioAdd">
+                                                        <label class="control-label">Fecha Fin:</label>
+                                                        <input type="date" class="form-control" id="AddFechaFinSuscripcion">
                                                     </div>
                                                 </div>
                                             </div>
@@ -956,11 +910,40 @@
                                             <button type="button" class="btn btn-default"
                                                 data-dismiss="modal">Cancelar</button>
                                             <button type="button" class="btn custom-button"
-                                                onclick="">Grabar</button>
+                                                onclick="AgregarSuscripcion();">Grabar</button>
                                         </div>
                                     </div>
                                 </div>
                             </div>
+
+
+                            <div class="modal fade" id="modal-confirmaEliminarSuscripcion" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
+                                <div class="modal-dialog">
+                                    <div class="modal-content">
+                                        <div class="modal-header">
+                                            <h4>
+                                                Confirmación
+                                            </h4>
+                                        </div>
+                                        <div class="modal-body">
+                                            <p id="idMensajeEliminarSuscripcion"></p>
+                                        </div>
+                                        <div class="modal-footer">
+                                            <button type="button" class="btn btn-large pull-right btn-default" style='margin:5px;' data-dismiss="modal">
+                                                Cancelar
+                                            </button>
+                                            <button type="button" class="btn btn-large pull-right custom-button" style='margin:5px;' data-dismiss="modal" onclick="EliminaSuscripcion();">
+                                                Aceptar
+                                            </button>
+                                        </div>
+
+                                    </div>
+                                </div>
+                            </div>
+
+
+
+
                         </div>
                     </div>
                 </div>
@@ -970,13 +953,12 @@
                     <div class="card">
                         <div class="card-body">
                             <h4 class="card-title">Listado de Suscripciones</h4>
-                            <table class="table" id="tablaTipoUsuario">
+                            <table class="table" id="tablaSuscripciones">
                                 <thead>
                                     <tr>
-                                        <th scope="col">Nombre</th>
-                                        <th scope="col">Rut</th>
-                                        <th scope="col">Tipo</th>
-                                        <th scope="col">Telefono</th>
+                                        <th scope="col">Usuario</th>
+                                        <th scope="col">Fecha Inicio</th>
+                                        <th scope="col">Fecha fin:</th>
                                         <th scope="col">Acciones</th>
                                     </tr>
                                 </thead>
@@ -988,7 +970,11 @@
                     </div>
                 </div>
             </div>
+            <div id="divMensajeNoEncontradoSuscripciones"> <h1>No se encontraron Suscripciones</h1> </div>
+
         </div>
+
+
         <!--TERMINA DIV SUSCRIPCION VIGENTE-->
 
     </div>

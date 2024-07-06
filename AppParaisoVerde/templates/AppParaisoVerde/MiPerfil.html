@@ -1,0 +1,202 @@
+{% load static %}
+
+<!DOCTYPE html>
+<head>
+
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css">
+    <link rel="stylesheet" href="https://cdn.materialdesignicons.com/5.4.55/css/materialdesignicons.min.css">
+    <link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.15.4/css/all.css">
+    <!-- Incluir jQuery solo una vez, la versión completa -->
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+    <!-- Bootstrap JS depende de jQuery, así que debe ir después de jQuery -->
+    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/js/bootstrap.min.js"></script>
+    <!-- Tus scripts personalizados van al final, después de las librerías de terceros -->
+    <script src="{% static 'js/funciones.js' %}"></script>
+    <link rel="stylesheet" href="{% static 'css/estilos.css' %}">
+    <link rel="icon" type="image/x-icon" href="{% static 'img/favicon.png' %}">
+    <title>Paraíso Verde | Mi Perfil</title>
+    <style>
+    .carrito-color {
+        color: #007bff; /* Cambia esto por el color que desees para el ícono del carrito */
+    }  
+    .carrito-cantidad {
+        background-color: #28a745; /* Cambia esto por el color que desees para el fondo del span */
+        color: #ffffff; /* Cambia esto por el color que desees para el texto dentro del span */
+    }
+    body {
+                font-family: "Open Sans", sans-serif;
+                height: 100vh;
+                background: url("{% static 'img/fondo.jpg' %}") 50% fixed;
+    
+                background-size: cover;
+            }
+    </style>
+    <script> 
+        $(document).ready(function() {
+           LlenarNavbar();
+           ObtenerCantidadProductosCarro();
+           BuscarInformacionUsuario();
+
+           BuscarMisCompras();
+
+           UsuarioSuscrito()
+            .then(() => {
+                PrepararBotonSuscripcion();
+            })
+            .catch(() => {
+                console.error("La promesa fue rechazada.");
+            });
+           $('.nav-link').on('click', function() {
+               // Eliminar la clase active-link de todos los enlaces
+               $('.nav-link').removeClass('active-link');
+               // Añadir la clase active-link al enlace clicado
+               $(this).addClass('active-link');
+           });
+       });
+   </script>
+</head>
+
+<body>
+   <div id="idNavbar"></div>
+   
+   <div class="container" style="margin-bottom: 1%;">
+
+       <div class="row">
+           <div class="col-12">
+               <div class="card mt-5">
+                        <div class="card-header" style="background-color: #800080;">
+                            <h3 style="color: #ffffff;">Información de la cuenta</h3>
+                        </div>
+                           <div class="card-body">
+                                <div class="form-group col-6">
+                                    <label for="nombre">Nombre</label>
+                                    <input type="text" class="form-control" id="nombre" placeholder="Nombre" disabled>
+                                </div>
+                                <div class="form-group col-6">
+                                    <label for="apellido">Apellido</label>
+                                    <input type="text" class="form-control" id="apellido" placeholder="Apellido" disabled>
+                                </div>
+
+                                <div class="form-group col-6">
+                                    <label for="email">Correo Electrónico</label>
+                                    <input type="email" class="form-control" id="email" placeholder="Correo Electrónico" disabled>
+                                </div>
+                                <div class="form-group col-6">
+                                    <label for="telefono">Teléfono</label>
+                                    <input type="text" class="form-control" id="telefono" placeholder="Teléfono" disabled>
+                                </div>
+                                <div class="form-group col-6">
+                                    <label for="direccion">Dirección</label>
+                                    <input type="text" class="form-control" id="direccion" placeholder="Dirección" disabled>
+                                </div>
+                                <div class="form-group col-6">
+                                    <label id="labelbtnCambiarSuscripcion" for="btnCambiarSuscripcion">Ajustar Suscripcion</label>
+                                    <button type="button" class="form-control custom-button" id="btnCambiarSuscripcion" value="">Texto</button>
+                                </div>
+                            </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="container" style="margin-bottom: 10%;">
+        <div class="row">
+            <div class="col-12">
+                <div class="card mt-5">
+                    <div class="card-header" style="background-color: #800080;">
+                        <h3 style="color: #ffffff;">Mis Compras</h3>
+                    </div>
+                            <div class="card-body">
+                                <div id="divSinCompras" style="display: none;">
+                                    <h2>No tienes compras realizadas</h2>
+                                </div>
+                                <div id="divMisCompras" style="align-content: center; margin-left: 2%; margin-right: 2%;"> 
+                                    
+                                    <table class="col-12" id="tablaMisCompras">
+                                        <thead>
+                                            <tr>
+                                                <th>Numero de Compra</th>
+                                                <th>Fecha</th>
+                                                <th>Descuento</th>
+                                                <th>Total pagado:</th>
+                                                <th>Estado</th>
+                                                <th>Ver detalle</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody>
+                                           
+                                        </tbody>
+                                 </table>
+                                </div>
+
+                             </div>
+                 </div>
+             </div>
+         </div>
+     </div>
+
+
+    <!-- FOOTER -->
+    <footer class="container-fluid navbar-personalizado d-flex align-items-center">
+       <div class="row">
+           <div class="col">
+               <div class="logo-background">
+                   <img src="{% static 'img/logoJardineria.png' %}" alt="Logo de Paraiso Verde" style="margin-top: 40px; margin-bottom: auto;" width="80px">
+               </div>
+           </div>
+           <div class="col">
+               <span class="footer-title">Tienda</span>
+               <hr class="footer-hr">
+               <ul>
+                   <li>Nosotros</li>
+                   <li>Contacto</li>
+               </ul>
+           </div>
+   
+           <div class="col">
+               <span class="footer-title">Plantas y Materiales Vegetales</span>
+               <hr class="footer-hr">
+               <ul>
+                   <li>Flores</li>
+                   <li>Arbustos</li>
+                   <li>Árboles</li>
+                   <li>Enredaderas</li>
+                   <li>Césped</li>
+               </ul>
+           </div>
+           <div class="col">
+               <span class="footer-title">Sustratos y abonos</span>
+               <hr class="footer-hr">
+               <ul>
+                   <li>Tierra para macetas</li>
+                   <li>Tierra de hojas</li>
+                   <li>Compost</li>
+                   <li>Fertilizantes (orgánicos e inorgánicos)</li>
+                   <li>Turba</li>
+               </ul>
+           </div>
+           <div class="col">
+               <span class="footer-title">Maceteros y jardineras</span>
+               <hr class="footer-hr">
+               <ul>
+                   <li>Macetas de plástico, barro, cerámica</li>
+                   <li>Jardineras de diferentes materiales</li>
+                   <li>Contenedores elevados</li>
+               </ul>
+           </div>
+           <div class="col">
+               <span class="footer-title">Herramientas de Jardinería</span>
+               <hr class="footer-hr">
+               <ul>
+                   <li>Palas y paletas</li>
+                   <li>Rastrillos</li>
+                   <li>Tijeras de podar</li>
+                   <li>Cuchillos de injerto</li>
+                   <li>Azadas</li>
+               </ul>
+           </div>
+       </div>
+   </footer>
+</body>

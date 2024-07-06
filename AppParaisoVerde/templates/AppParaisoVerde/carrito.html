@@ -41,7 +41,14 @@
         $(document).ready(function() {
            LlenarNavbar();
            ObtenerCantidadProductosCarro();
-           buscarProductosCarrito();
+
+           UsuarioSuscrito()
+            .then(() => {
+                buscarProductosCarrito();
+            })
+            .catch(() => {
+                console.error("La promesa fue rechazada.");
+            });
            $('.nav-link').on('click', function() {
                // Eliminar la clase active-link de todos los enlaces
                $('.nav-link').removeClass('active-link');
@@ -54,7 +61,7 @@
 
 <body>
    <div id="idNavbar"></div>
-    <div class="container-fluid" style="margin-top: 10px;">
+    <div class="container-fluid" style="margin-top: 10px; margin-bottom: 10%;">
         <div class="container mt-5" id="divTablaCarrito">
             <h1 class="mb-4" style="background-color: #800080; color: #ffffff;">Carrito de Compras</h1>
             <table class="table table-bordered" id="tablaProductosCarrito">
@@ -72,27 +79,10 @@
                 </tbody>
             </table>
         </div>
-        <div class="col-md-9 custom-container"  id="divMensajeNoEncontradoProductosCarrito" style="background-color: #800080; color: #ffffff; display: none;">
+        <div class="col-md-9 custom-container"  id="divMensajeNoEncontradoProductosCarrito" style="background-color: #800080; color: #ffffff; display: none; ">
                <h2>No tienes productos en el carro</h2>
-           </div>
-           <br>
-        <br>
-        <br>
-        <br>
-        <br>
-        <br>
-        <br>
-        <br>
-        <br>
-        <br>
-        <br>
-        <br>
-        <br>
-        <br>
-        <br>
-        <br>
-        <br>
-        <br>
+        </div>
+      
       
    </div>
 

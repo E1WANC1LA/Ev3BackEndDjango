@@ -65,6 +65,7 @@ class Compra(models.Model):
     usuario = models.ForeignKey('Usuario', on_delete=models.CASCADE)
     fecha_compra = models.DateTimeField(default=timezone.now)
     total = models.DecimalField(max_digits=10, decimal_places=2)
+    descontado = models.DecimalField(max_digits=10, decimal_places=2)
     estado_despacho = models.CharField(max_length=50,)
 
     def __str__(self):
@@ -87,6 +88,7 @@ class DetalleCompra(models.Model):
 class Suscripcion(models.Model):
     id_suscripcion = models.AutoField(primary_key=True)
     usuario = models.ForeignKey('Usuario', on_delete=models.CASCADE)
+    fecha_inicio_suscripcion = models.DateTimeField(default=timezone.now)
     fecha_fin_suscripcion = models.DateTimeField(default=timezone.now)
 
     def __str__(self):

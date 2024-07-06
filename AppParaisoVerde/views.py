@@ -1,18 +1,31 @@
 from django.shortcuts import render,get_object_or_404
+from reportlab.pdfgen import canvas
+from reportlab.lib.pagesizes import letter
+from reportlab.platypus import SimpleDocTemplate, Table, TableStyle , Image,Spacer,PageBreak
+from reportlab.lib import colors
+from django.http import HttpResponse
 from django.http import JsonResponse
 from .models import Usuario, TipoUsuario, TipoProducto, Producto, Promocion, Compra,Suscripcion,DetalleCompra
 import traceback
 from django.forms.models import model_to_dict
 from django.core.files.storage import FileSystemStorage
 from uuid import uuid4
-import os
+import os,json
+from datetime import datetime, timedelta
+from django.conf import settings
+
 
 
 def index(request):
+    if 'tipo_usuario' in request.session and request.session['tipo_usuario'] == 1:
+        return render(request, 'AppParaisoVerde/administrar.html')
     return render(request, 'AppParaisoVerde/index.html')
 
 def iniciarSesion(request):
     return render(request, 'AppParaisoVerde/iniciarSesion.html')
+
+def MiPerfil(request):
+    return render(request, 'AppParaisoVerde/MiPerfil.html')
 
 def nosotros(request):
     return render(request, 'AppParaisoVerde/nosotros.html')
@@ -60,29 +73,268 @@ def BuscarProductosCarrito(request):
 
 
 
+
+def AdminBuscarSuscripciones(request):
+    if request.method == 'POST':
+        try:
+            fecha_inicio = request.POST.get('FechaInicio', '1900-01-01')
+            fecha_fin = request.POST.get('FechaFin', '9999-12-31')
+            id_usuario = request.POST.get('Usuario', '0')
+            suscripciones = Suscripcion.objects.raw('''
+                SELECT s.*, u.nombre as usuario_nombre
+                FROM AppParaisoVerde_suscripcion s
+                LEFT JOIN AppParaisoVerde_usuario u ON s.usuario_id = u.id_usuario
+                WHERE s.fecha_inicio_suscripcion >= %s AND s.fecha_fin_suscripcion <= %s AND (s.usuario_id = %s OR %s = '0')
+            ''', [fecha_inicio, fecha_fin, id_usuario, id_usuario])
+            suscripciones_dict = []
+            for suscripcion in suscripciones:
+                suscripcion_dict = model_to_dict(suscripcion)
+                suscripcion_dict['usuario_nombre'] = suscripcion.usuario_nombre
+    
+                suscripciones_dict.append(suscripcion_dict)
+            return JsonResponse({'estado': 'completado', 'datos': suscripciones_dict}, safe=False)
+        except Exception as e:
+            return JsonResponse({
+                'Excepciones': {
+                    'message': str(e),  # Mensaje de la excepción
+                    'type': type(e).__name__,  # Tipo de la excepción
+                    'details': traceback.format_exc()  # Detalles de la excepción
+                      }
+            })
+    else:
+        return JsonResponse({'estado': 'fallido'})
+
+
+def BuscarMisCompras(request):
+    if request.method == 'POST':
+        try:
+            id_usuario = request.session['idUsuario']
+            compras = Compra.objects.filter(usuario_id=id_usuario)
+            compras_dict = []
+            for compra in compras:
+                compra_dict = model_to_dict(compra)
+                compra_dict['fecha_compra'] = compra.fecha_compra.strftime('%Y-%m-%d %H:%M:%S')  
+                compras_dict.append(compra_dict)
+
+            if compras_dict.__len__() == 0:
+                return JsonResponse({'estado': 'sin compras', 'datos': 'sin resultados'})    
+            return JsonResponse({'estado': 'completado', 'datos': compras_dict}, safe=False)
+        except Exception as e:
+            return JsonResponse({
+                'Excepciones': {
+                    'message': str(e),  # Mensaje de la excepción
+                    'type': type(e).__name__,  # Tipo de la excepción
+                    'details': traceback.format_exc()  # Detalles de la excepción
+                      }
+            })
+    else:
+        return JsonResponse({'estado': 'fallido'})
+
+def UsuarioSuscrito(request):
+    if request.method == 'POST':
+        try:
+            id_usuario = request.session['idUsuario']
+            fecha_actual = datetime.now()
+            fecha_actual = fecha_actual + timedelta(days=30)
+            fecha_actual = fecha_actual - timedelta(days=30)
+            query = '''
+            SELECT * FROM AppParaisoVerde_suscripcion
+            WHERE usuario_id = %s
+            AND fecha_fin_suscripcion >= %s
+            AND fecha_inicio_suscripcion <= %s
+            '''
+            params = [id_usuario, fecha_actual, fecha_actual]
+            suscripcion = Suscripcion.objects.raw(query, params)
+
+            # Verificar si hay resultados
+            suscripcion_list = list(suscripcion)
+
+            if suscripcion_list:
+                return JsonResponse({'estado': 'completado', 'datos': 'existe'})
+            else:
+                return JsonResponse({'estado': 'completado', 'datos': 'no existe'})  
+        except Exception as e:
+            return JsonResponse({
+                'Excepciones': {
+                    'message': str(e),  # Mensaje de la excepción
+                    'type': type(e).__name__,  # Tipo de la excepción
+                    'details': traceback.format_exc()  # Detalles de la excepción
+                      }
+            })
+    else:
+        return JsonResponse({'estado': 'fallido'})
+
+
+
+def AdminCrearSuscripcion(request):
+    if request.method == 'POST':
+        try:
+            id_usuario = request.POST.get('Usuario')
+            fecha_inicio_suscripcion = request.POST.get('FechaInicio')
+            fecha_fin_suscripcion = request.POST.get('FechaFin')
+
+            fecha_inicio_nueva = datetime.strptime(fecha_inicio_suscripcion, "%Y-%m-%d").date()
+            fecha_fin_nueva = datetime.strptime(fecha_fin_suscripcion, "%Y-%m-%d").date()
+
+
+            usuario = get_object_or_404(Usuario, pk=id_usuario)
+
+            raw_query = """
+            SELECT * FROM AppParaisoVerde_suscripcion
+            WHERE usuario_id = %s
+            AND (
+                (fecha_inicio_suscripcion <= %s AND fecha_fin_suscripcion >= %s)
+                OR
+                (fecha_inicio_suscripcion <= %s AND fecha_fin_suscripcion >= %s)
+                OR
+                (%s between fecha_inicio_suscripcion AND fecha_fin_suscripcion)
+                OR
+                (%s between fecha_inicio_suscripcion AND fecha_fin_suscripcion)
+                OR
+                (fecha_inicio_suscripcion = %s)
+            )
+            """
+            suscripciones_existentes = Suscripcion.objects.raw(raw_query, [id_usuario, fecha_fin_nueva, fecha_inicio_nueva, fecha_fin_nueva, fecha_inicio_nueva, fecha_inicio_nueva, fecha_fin_nueva,fecha_fin_nueva])
+
+            # Verificar si hay resultados
+            if len(list(suscripciones_existentes)) > 0:
+                return JsonResponse({'estado': 'fallido', 'error': 'Ya existe una suscripción activa en ese rango de fechas para este usuario.'})
+
+
+            suscripcion = Suscripcion(usuario=usuario, fecha_inicio_suscripcion=fecha_inicio_nueva, fecha_fin_suscripcion=fecha_fin_nueva)
+            suscripcion.save()
+
+            return JsonResponse({'estado': 'completado'})
+        except Exception as e:
+            return JsonResponse({
+                'Excepciones': {
+                    'message': str(e),  # Mensaje de la excepción
+                    'type': type(e).__name__,  # Tipo de la excepción
+                    'details': traceback.format_exc()  # Detalles de la excepción
+                      }
+            })
+    else:
+        return JsonResponse({'estado': 'fallido'})
+
+def AdminBuscarUsuariosCMB(request):
+    if request.method == 'POST':
+        try:
+            usuarios = Usuario.objects.filter(tipo_usuario_id=2)
+            usuarios_dict = [model_to_dict(usuario) for usuario in usuarios]
+            return JsonResponse({'estado': 'completado', 'datos': usuarios_dict}, safe=False)
+        except Exception as e:
+            return JsonResponse({
+                'Excepciones': {
+                    'message': str(e),  # Mensaje de la excepción
+                    'type': type(e).__name__,  # Tipo de la excepción
+                    'details': traceback.format_exc()  # Detalles de la excepción
+                      }
+            })
+    else:
+        return JsonResponse({'estado': 'fallido'})
+
+
+
+def AdminEliminarSuscripcion(request):
+    if request.method == 'POST':
+        try:
+            id_suscripcion = request.POST.get('IdSuscripcion')
+            suscripcion = get_object_or_404(Suscripcion, pk=id_suscripcion)
+            suscripcion.delete()
+            return JsonResponse({'estado': 'completado'})
+        except Exception as e:
+            return JsonResponse({
+                'Excepciones': {
+                    'message': str(e),  # Mensaje de la excepción
+                    'type': type(e).__name__,  # Tipo de la excepción
+                    'details': traceback.format_exc()  # Detalles de la excepción
+                      }
+            })
+    else:
+        return JsonResponse({'estado': 'fallido'})
+
+def BuscarInformacionUsuario(request):
+    if request.method == 'POST':
+        try:
+            id_usuario = request.session['idUsuario']
+            usuario = get_object_or_404(Usuario, pk=id_usuario)
+            usuario_dict = model_to_dict(usuario)
+            return JsonResponse({'estado': 'completado', 'datos': usuario_dict})
+        except Exception as e:
+            return JsonResponse({
+                'Excepciones': {
+                    'message': str(e),  # Mensaje de la excepción
+                    'type': type(e).__name__,  # Tipo de la excepción
+                    'details': traceback.format_exc()  # Detalles de la excepción
+                      }
+            })
+    else:
+        return JsonResponse({'estado': 'fallido'})
+
+def Suscribirse(request):
+    if request.method == 'POST':
+        try:
+            id_usuario = request.session['idUsuario']
+            fecha_actual = datetime.now()
+            fecha_fin = fecha_actual + timedelta(days=30)
+            suscripcion = Suscripcion(usuario_id=id_usuario, fecha_inicio_suscripcion=fecha_actual, fecha_fin_suscripcion=fecha_fin)
+            suscripcion.save()
+            return JsonResponse({'estado': 'completado'})
+        except Exception as e:
+            return JsonResponse({
+                'Excepciones': {
+                    'message': str(e),  # Mensaje de la excepción
+                    'type': type(e).__name__,  # Tipo de la excepción
+                    'details': traceback.format_exc()  # Detalles de la excepción
+                      }
+            })
+    else:
+        return JsonResponse({'estado': 'fallido'})
+
+def CancelarSuscripcion(request):
+    if request.method == 'POST':
+        try:
+            id_usuario = request.session['idUsuario']
+            suscripcion = Suscripcion.objects.filter(usuario_id=id_usuario)
+            suscripcion.delete()
+            return JsonResponse({'estado': 'completado'})
+        except Exception as e:
+            return JsonResponse({
+                'Excepciones': {
+                    'message': str(e),  # Mensaje de la excepción
+                    'type': type(e).__name__,  # Tipo de la excepción
+                    'details': traceback.format_exc()  # Detalles de la excepción
+                      }
+            })
+    else:
+        return JsonResponse({'estado': 'fallido'})
+
 def ComprarCarrito(request):
     if request.method == 'POST':
         try:
+            id_usuario = request.session['idUsuario']
+            fecha_actual = datetime.now()
+            total = request.POST.get('Total')
+            descontado = request.POST.get('Descontado')
+            if descontado == 'in descuento':
+                descontado = 0
+            estado_despacho = request.POST.get('EstadoDespacho')
+            productos_json = request.POST.get('Productos')
+            productos = json.loads(productos_json)
+            compra = Compra(usuario_id=id_usuario, fecha_compra=fecha_actual, total=total, descontado=descontado, estado_despacho=estado_despacho)
+            compra.save()
+
+            max_id_compra = Compra.objects.raw('SELECT MAX(id_compra) as id_compra FROM AppParaisoVerde_compra where usuario_id = %s', [id_usuario])
+
+            for producto in productos:
+                id_producto = producto['id_producto']
+                cantidad = producto['cantidad']
+                precio = producto['precio']
+                detalle_compra = DetalleCompra(compra_id=max_id_compra[0].id_compra, producto_id=id_producto, cantidad=cantidad, total_producto=precio)
+                detalle_compra.save()
             del request.session['carro']
             return JsonResponse({'estado': 'completado'})
-            # if 'carro' in request.session:
-            #     carro = request.session['carro']
-            #     id_usuario = request.session['idUsuario']
-            #     usuario = get_object_or_404(Usuario, pk=id_usuario)
-            #     total = 0
-            #     for producto in carro['productos'].values():
-            #         producto_obj = get_object_or_404(Producto, pk=producto['idProducto'])
-            #         total += producto_obj.precio_unitario * producto['cantidad']
-            #     compra = Compra(usuario=usuario, total=total, estado_despacho='Pendiente')
-            #     compra.save()
-            #     for producto in carro['productos'].values():
-            #         producto_obj = get_object_or_404(Producto, pk=producto['idProducto'])
-            #         detalle_compra = DetalleCompra(compra=compra, producto=producto_obj, cantidad=producto['cantidad'], total_producto=producto_obj.precio_unitario*producto['cantidad'])
-            #         detalle_compra.save()
-            #     del request.session['carro']
-            #     return JsonResponse({'estado': 'completado'})
-            # else:
-            #     return JsonResponse({'estado': 'sin carro'})
+            
         except Exception as e:
             return JsonResponse({
                 'Excepciones': {
@@ -93,6 +345,109 @@ def ComprarCarrito(request):
             })
     else:
         return JsonResponse({'estado': 'fallido'})
+
+
+def ImprimirDetalleCompra(request):
+    if request.method == 'POST':
+        try:
+            id_compra = request.POST.get('IdCompra')
+            compra = Compra.objects.get(id_compra=id_compra)  
+            detalle_compra = compra.detallecompra_set.all()  
+
+            response = HttpResponse(content_type='application/pdf')
+            response['Content-Disposition'] = f'attachment; filename="compra_{id_compra}.pdf"'
+
+            doc = SimpleDocTemplate(response, pagesize=letter)
+            elements = []
+
+            id_usuario = request.session['idUsuario']
+            usuario = Usuario.objects.get(id_usuario=id_usuario)
+
+            
+            ruta_imagen_absoluta = os.path.join(settings.BASE_DIR, 'static\img\logoJardineria.png')
+
+            imagen = Image(ruta_imagen_absoluta, width=100, height=50 ,  hAlign='LEFT')
+            elements.append(imagen)
+
+            elements.append(Spacer(1, 50))
+
+            usuario_info = [["Datos del Cliente", ''],["Nombre:", usuario.nombre], ["Correo:", usuario.correo], ["Teléfono:", usuario.telefono]]
+            t_usuario = Table(usuario_info, colWidths=[200, 150],hAlign='LEFT')
+            t_usuario.setStyle(TableStyle([('BACKGROUND', (0, 0), (-1, 0), colors.grey),
+                                        ('TEXTCOLOR', (0, 0), (-1, 0), colors.whitesmoke),
+                                        ('ALIGN', (0, 0), (-1, -1), 'LEFT'),
+                                        ('FONTNAME', (0, 0), (-1, -1), 'Helvetica'),
+                                        ('BOTTOMPADDING', (0, 0), (-1, -1), 12),
+                                        ('TOPPADDING', (0, 0), (-1, -1), 12),
+                                        ('BOX', (0, 0), (-1, -1), 1, colors.black),  
+                                        ('GRID', (0, 1), (-1, -1), 1, colors.black) 
+                                        ]))
+            elements.append(t_usuario)
+            
+            elements.append(Spacer(1, 50))
+
+            if compra:
+                compra_info = [["Datos de Compra:", ''],
+                            ["Numero de Compra:", compra.id_compra],
+                            ["Fecha:", compra.fecha_compra.strftime("%Y-%m-%d")],
+                            ["Estado Despacho:", compra.estado_despacho],
+                            ["Descuento:", compra.descontado],
+                            ["Total:", compra.total]]
+                t = Table(compra_info, colWidths=[200, 150],hAlign='LEFT')
+                t.setStyle(TableStyle([('BACKGROUND', (0, 0), (-1, 0), colors.grey),
+                                        ('TEXTCOLOR', (0, 0), (-1, 0), colors.whitesmoke),
+                                        ('ALIGN', (0, 0), (-1, -1), 'LEFT'),
+                                        ('FONTNAME', (0, 0), (-1, -1), 'Helvetica'),
+                                        ('BOTTOMPADDING', (0, 0), (-1, -1), 12),
+                                        ('TOPPADDING', (0, 0), (-1, -1), 12),
+                                        ('BOX', (0, 0), (-1, -1), 1, colors.black),  
+                                        ('GRID', (0, 1), (-1, -1), 1, colors.black) 
+                                        ]))
+                elements.append(t)
+                elements.append(PageBreak())
+
+            # Cabeceras de la tabla de detalles
+            detalle_headers = [['Imagen','Producto', 'Cantidad', 'Precio']]
+            detalle_data1 = detalle_headers
+
+            detalle_data = []
+            for detalle in detalle_compra:
+                producto = Producto.objects.get(id_producto=detalle.producto_id)
+                ruta_imagen = os.path.join(settings.BASE_DIR, 'static\img\\' + producto.imagen_nombre)
+                imagen_producto = Image(ruta_imagen, width=50, height=50)  # Ajusta el tamaño según sea necesario
+                detalle_data.append([imagen_producto, producto.nombre, detalle.cantidad, detalle.total_producto])
+
+            t = Table(detalle_data1 + detalle_data, colWidths=[50, 200, 100, 100])  # Ajusta según sea necesario
+            t.setStyle(TableStyle([
+                ('BACKGROUND', (0, 0), (-1, 0), colors.grey),
+                ('TEXTCOLOR', (0, 0), (-1, 0), colors.whitesmoke),
+                ('ALIGN', (0, 0), (-1, -1), 'CENTER'),
+                ('FONTNAME', (0, 0), (-1, -1), 'Helvetica'),
+                ('BOTTOMPADDING', (0, 0), (-1, -1), 12),
+                ('TOPPADDING', (0, 0), (-1, -1), 12),
+                ('BOX', (0, 0), (-1, -1), 1, colors.black),  
+                ('GRID', (0, 1), (-1, -1), 1, colors.black) 
+                ]))
+
+            # Suponiendo que 'elements' es una lista donde estás agregando todos los elementos para luego generar un PDF
+            elements.append(t)
+
+            # Construir el PDF
+            doc.build(elements)
+            return response
+        except Exception as e:
+            return JsonResponse({
+                'Excepciones': {
+                    'message': str(e),  # Mensaje de la excepción
+                    'type': type(e).__name__,  # Tipo de la excepción
+                    'details': traceback.format_exc()  # Detalles de la excepción
+                }
+            })
+    else:
+        return JsonResponse({'estado': 'fallido'})
+
+
+
 
 
 
