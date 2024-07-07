@@ -55,4 +55,10 @@ urlpatterns = [
     path('BuscarInformacionUsuario/', views.BuscarInformacionUsuario, name='BuscarInformacionUsuario'),
     path('BuscarMisCompras/', views.BuscarMisCompras, name='BuscarMisCompras'),
     path('ImprimirDetalleCompra/', views.ImprimirDetalleCompra, name='ImprimirDetalleCompra'),
+    path('AdminBuscarProductosCMB/', views.AdminBuscarProductosCMB, name='AdminBuscarProductosCMB'),
+    path('AdminAgregarPromocion/', views.AdminAgregarPromocion, name='AdminAgregarPromocion'),
+    path('AdminBuscarPromociones/', views.AdminBuscarPromociones, name='AdminBuscarPromociones'),
+    path('AdminEliminarPromocion/', views.AdminEliminarPromocion, name='AdminEliminarPromocion'),
+    path('AdminBuscarPromocionEditar/', views.AdminBuscarPromocionEditar, name='AdminBuscarPromocionEditar'),
+    path('AdminEditarPromocion/', views.AdminEditarPromocion, name='AdminEditarPromocion'),
 ]

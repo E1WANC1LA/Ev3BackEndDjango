@@ -4,6 +4,7 @@ var GL_ID_USUARIO=0;
 var GL_ID_PRODUCTO=0;
 var GL_ID_SUSCRIPCION=0;
 var GL_SUSCRITO=false;
+var GL_ID_PROMOCION=0;
 
 function LlenarNavbar(){
     var navbarHtml='';
@@ -163,16 +164,34 @@ function buscarProductosComprar(){
                 var productos = response.datos;
                 $('#productList').empty();
                 $.each(productos, function(i, producto) {
-                    $('#productList').append(`
-                        <div class="producto col-md-3" data-IdProducto="${producto.id_producto}" data-nombre="${producto.nombre}" data-tipo="${producto.tipo_producto}" data-precio="${producto.precio_unitario}">
-                                <img src="../../static/img/${producto.imagen_nombre}" class="card-img-top img" alt="Imagen del producto">
-                                <p class="card-text">Nombre: ${producto.nombre}</p>
-                                <p class="card-text">Precio: ${producto.precio_unitario}</p>
-                                <p class="card-text">Tipo: ${producto.tipo_producto_nombre}</p>
-                                <input type="number" class="quantity-input cantidad">
-                                <button  class="add-to-cart custom-button" onclick="anadirAlCarro(this);">Añadir al carro</button>
-                        </div>
-                    `);
+                    if (producto.descuento == 0) {
+                        $('#productList').append(`
+                            <div class="producto col-md-3" data-IdProducto="${producto.id_producto}" data-nombre="${producto.nombre}" data-tipo="${producto.tipo_producto}" data-precio="${producto.precio_unitario}">
+                                    <img src="../../static/img/${producto.imagen_nombre}" class="card-img-top img" alt="Imagen del producto">
+                                    <p class="card-text">Nombre: ${producto.nombre}</p>
+                                    <p class="card-text">Precio: ${producto.precio_unitario}</p>
+                                    <p class="card-text">Tipo: ${producto.tipo_producto_nombre}</p>
+                                    <input type="number" class="quantity-input cantidad">
+                                    <button  class="add-to-cart custom-button" onclick="anadirAlCarro(this);">Añadir al carro</button>
+                            </div>
+                        `);
+                    }
+                    if (producto.descuento != 0) {
+                        $('#productList').append(`
+                            <div class="producto col-md-3" data-IdProducto="${producto.id_producto}" data-nombre="${producto.nombre}" data-tipo="${producto.tipo_producto}" data-precio="${producto.precio_unitario}">
+                                    <img src="../../static/img/${producto.imagen_nombre}" class="card-img-top img" alt="Imagen del producto">
+                                    <p class="card-text">Nombre: ${producto.nombre}</p>
+                                    <p class="card-text">
+                                    <span style="text-decoration: line-through;">Precio: ${producto.precio_unitario}</span>
+                                    <span>Precio con descuento: ${producto.precio_unitario - (producto.precio_unitario * (producto.descuento / 100))}</span>
+                                    </p>
+                                    <p class="card-text">Tipo: ${producto.tipo_producto_nombre}</p>
+                                    <p class="card-text">Descuento: ${producto.descuento} %</p>
+                                    <input type="number" class="quantity-input cantidad">
+                                    <button  class="add-to-cart custom-button" onclick="anadirAlCarro(this);">Añadir al carro</button>
+                            </div>
+                        `);
+                    }
                 });
             } else {
                 alert('Falló la busqueda de productos');
@@ -556,6 +575,312 @@ function buscarTiposUsuario(){
 
 
 }
+
+
+function llenarCmbProducto(cmb){
+    return new Promise((resolve, reject) => {
+
+        var fd = new FormData();
+        $.ajax({
+            type: "POST",
+            url: "/AdminBuscarProductosCMB/",
+            data: fd,
+            contentType: false,
+            processData: false,
+            headers: { "X-CSRFToken": getCookie("csrftoken") },
+            success: function (response) {
+                console.log(response);
+                if (response.Excepciones != null) {
+                    alert('Ha ocurrido un error inesperado');
+                    console.log(response.Excepciones.message + '\n' + response.Excepciones.type + '\n' + response.Excepciones.details);
+                    reject();
+                    return;
+                }
+                if(response.estado === 'completado') {
+                    $('#'+cmb.toString()+'').empty();
+                    $('#'+cmb.toString()+'').append('<option value="0">Seleccione un producto</option>');
+                    $.each(response.datos, function(i, producto) {
+                        $('#'+cmb.toString()+'').append('<option value="'+producto.id_producto+'">'+producto.nombre+'</option>');
+                    });
+                    resolve();
+            
+                } else {
+                    alert('Falló la recuperacion del producto');
+                    reject();
+                }
+
+            },
+            error: function (XMLHttpRequest, text, error) { ; alert(XMLHttpRequest.responseText);
+                reject();
+                },
+            failure: function (response) { alert(response);
+                reject();
+            }
+        });
+    });
+
+}
+
+function buscarPromociones(){
+    var descuento = $('#DescuentoPromocionBus').val();
+    var descripcion = $('#DescripcionPromocionBus').val();
+    var producto = $('#cboProductoPromocionoBus').val();
+
+    if (descuento.toString() === '') {
+        descuento = '0';
+    }
+    if (descripcion.toString() === '') {
+        descripcion = '';
+    }
+    if (producto == null || producto.toString() === '0'){
+        producto = '0';
+    }
+
+
+    var fd = new FormData();
+
+    fd.append("Descuento", descuento);
+    fd.append("Descripcion", descripcion);
+    fd.append("Producto", producto);
+
+    $('#tablaPromociones tbody').empty();
+    $('#divMensajeNoEncontradoPromociones').hide();
+    $.ajax({
+            type: "POST",
+            url: "/AdminBuscarPromociones/",
+            data: fd,
+            contentType: false,
+            processData: false,
+            headers: { "X-CSRFToken": getCookie("csrftoken") },
+            success: function (response) {
+                console.log(response);
+                if (response.Excepciones != null) {
+                    alert('Ha ocurrido un error inesperado');
+                    console.log(response.Excepciones.message + '\n' + response.Excepciones.type + '\n' + response.Excepciones.details);
+                    return;
+                }
+                if(response.estado === 'completado') {
+                    var tabla = $('#tablaPromociones');
+                    if (response.datos.length == 0) {
+                        $('#tablaPromociones').parent().parent().parent().parent().hide();
+                        $('#divMensajeNoEncontradoPromociones').show();
+                        return;
+                    }
+                    $('#tablaPromociones').parent().parent().parent().parent().show();
+
+                    $.each(response.datos, function(i, promocion) {
+                        var FilaDatos = document.createElement("tr");
+
+                        var cellId = document.createElement("td");
+                        var cellDescripcion = document.createElement("td");
+                        var cellDescuento = document.createElement("td");
+                        var cellProducto = document.createElement("td");
+                        var cellAcciones = document.createElement("td");
+
+                        cellId.innerHTML = promocion.id_promocion;
+                        cellDescripcion.innerHTML = promocion.descripcion;
+                        cellDescuento.innerHTML = promocion.descuento;
+                        cellProducto.innerHTML = promocion.producto_nombre; 
+                        cellProducto.className = 'nombreProducto';
+                        cellAcciones.innerHTML = '<button class="btn" onclick="PrepararModalEditarPromocion('+promocion.id_promocion+');"><i class="mdi mdi-pencil"></i></button> <button class="btn" onclick="EliminaPromocion('+promocion.id_promocion+',this);"><i class="mdi mdi-trash-can-outline"></i></button>';
+
+                        FilaDatos.appendChild(cellId);
+                        FilaDatos.appendChild(cellProducto);
+                        FilaDatos.appendChild(cellDescripcion);
+                        FilaDatos.appendChild(cellDescuento);
+                        FilaDatos.appendChild(cellAcciones);
+
+                        tabla.append(FilaDatos);
+
+                    });
+
+                } else {
+                    alert('Falló la busqueda de promociones');
+                }
+
+            },
+            error: function (XMLHttpRequest, text, error) { ; alert(XMLHttpRequest.responseText); },
+            failure: function (response) { alert(response); }
+            });
+}
+
+
+function GrabarPromocion(){
+    var msg = '';
+    if ($('#AddDescuentoPromocion').val() == "" || isNaN(parseInt($('#AddDescuentoPromocion').val())) || parseInt($('#AddDescuentoPromocion').val()) <= 0) {
+        msg += '\nDebe ingresar un descuento valido';
+    }
+    if ($('#AddDescripcionPromocion').val() == "") {
+        msg += '\nDebe ingresar una descripción';
+    }
+    if ($('#cmbProductoAddPromocion').val() == 0) {
+        msg += '\nDebe seleccionar un producto';
+    }
+    if (msg != '') {
+        alert(msg);
+        return;
+    }
+
+    var fd = new FormData();
+    fd.append("Descuento", $('#AddDescuentoPromocion').val());
+    fd.append("Descripcion", $('#AddDescripcionPromocion').val());
+    fd.append("Producto", $('#cmbProductoAddPromocion').val());
+    $.ajax({
+        type: "POST",
+        url: "/AdminAgregarPromocion/",
+        data: fd,
+        contentType: false,
+        processData: false,
+        headers: { "X-CSRFToken": getCookie("csrftoken") },
+        success: function (response) {
+            console.log(response);
+            if (response.Excepciones != null) {
+                alert('Ha ocurrido un error inesperado');
+                console.log(response.Excepciones.message + '\n' + response.Excepciones.type + '\n' + response.Excepciones.details);
+                return;
+            }
+            if (response.error != null) {
+                alert(response.error);
+                return;
+            }
+            
+            if(response.estado === 'completado') {
+                alert('Promoción agregada con éxito');
+                buscarPromociones();
+                $('#modal-agregarPromociones').modal('hide');
+            }
+            if (response.estado === 'fallido'){
+                alert('Falló la adición de la promoción');
+            }
+
+        },
+        error: function (XMLHttpRequest, text, error) { ; alert(XMLHttpRequest.responseText); },
+        failure: function (response) { alert(response); }
+    });
+
+}
+
+function EliminaPromocion (id_promocion,element){
+    var nombre = $(element).closest('tr').find('.nombreProducto').text();
+    $('#idMensajeEliminarPromocion').html('¿Está seguro que desea eliminar la promoción del producto '+nombre.toString()+'?');
+    $('#modal-confirmaEliminarPromocion').modal('show');
+    GL_ID_PROMOCION = id_promocion;
+}
+
+function PrepararModalAgregarPromocion(){
+    $('#AddDescuentoPromocion').val('');
+    $('#AddDescripcionPromocion').val('');
+    llenarCmbProducto('cmbProductoAddPromocion');
+}
+
+
+function EliminarPromocion(){
+    var fd = new FormData();
+    fd.append("IdPromocion", GL_ID_PROMOCION);
+    $.ajax({
+        type: "POST",
+        url: "/AdminEliminarPromocion/",
+        data: fd,
+        contentType: false,
+        processData: false,
+        headers: { "X-CSRFToken": getCookie("csrftoken") },
+        success: function (response) {
+            console.log(response);
+            if (response.Excepciones != null) {
+                alert('Ha ocurrido un error inesperado');
+                console.log(response.Excepciones.message + '\n' + response.Excepciones.type + '\n' + response.Excepciones.details);
+                return;
+            }
+            if(response.estado === 'completado') {
+                alert('Promoción eliminada con éxito');
+                buscarPromociones();
+            } else {
+                alert('Falló la eliminación de la promoción');
+            }
+        },
+        error: function (XMLHttpRequest, text, error) { ; alert(XMLHttpRequest.responseText); },
+        failure: function (response) { alert(response); }
+    });
+}
+
+function EditarPromocion(){
+    var msg = '';
+    if ($('#EditDescuentoPromocion').val() == "" || isNaN(parseInt($('#EditDescuentoPromocion').val())) || parseInt($('#EditDescuentoPromocion').val()) <= 0) {
+        msg += '\nDebe ingresar un descuento valido';
+    }
+    if ($('#EditDescripcionPromocion').val() == "") {
+        msg += '\nDebe ingresar una descripción';
+    }
+    if (msg != '') {
+        alert(msg);
+        return;
+    }
+
+    var fd = new FormData();
+    fd.append("IdPromocion", GL_ID_PROMOCION);
+    fd.append("Descuento", $('#EditDescuentoPromocion').val());
+    fd.append("Descripcion", $('#EditDescripcionPromocion').val());
+    $.ajax({
+        type: "POST",
+        url: "/AdminEditarPromocion/",
+        data: fd,
+        contentType: false,
+        processData: false,
+        headers: { "X-CSRFToken": getCookie("csrftoken") },
+        success: function (response) {
+            console.log(response);
+            if (response.Excepciones != null) {
+                alert('Ha ocurrido un error inesperado');
+                console.log(response.Excepciones.message + '\n' + response.Excepciones.type + '\n' + response.Excepciones.details);
+                return;
+            }
+            if(response.estado === 'completado') {
+                alert('Promoción editada con éxito');
+                buscarPromociones();
+                $('#modal-editarPromocion').modal('hide');
+            } else {
+                alert('Falló la edición de la promoción');
+            }
+
+        },
+        error: function (XMLHttpRequest, text, error) { ; alert(XMLHttpRequest.responseText); },
+        failure: function (response) { alert(response); }
+    });
+}
+
+
+function PrepararModalEditarPromocion(id_promocion){
+    $('#modal-editarPromocion').modal('show');
+    GL_ID_PROMOCION = id_promocion;
+    var fd = new FormData();
+    fd.append("IdPromocion", id_promocion);
+    $.ajax({
+        type: "POST",
+        url: "/AdminBuscarPromocionEditar/",
+        data: fd,
+        contentType: false,
+        processData: false,
+        headers: { "X-CSRFToken": getCookie("csrftoken") },
+        success: function (response) {
+            console.log(response);
+            if (response.Excepciones != null) {
+                alert('Ha ocurrido un error inesperado');
+                console.log(response.Excepciones.message + '\n' + response.Excepciones.type + '\n' + response.Excepciones.details);
+                return;
+            }
+            if(response.estado === 'completado') {
+                $('#EditDescuentoPromocion').val((response.datos.descuento).toString());
+                $('#EditDescripcionPromocion').val((response.datos.descripcion).toString());
+            } else {
+                alert('Falló la recuperacion de la promoción');
+            }
+
+        },
+        error: function (XMLHttpRequest, text, error) { ; alert(XMLHttpRequest.responseText); },
+        failure: function (response) { alert(response); }
+    });
+}
+
 
 
 function PrepararModalEditarTipoProducto(id_tipo_producto){
@@ -1245,15 +1570,22 @@ function buscarProductosCarrito(){
                         cellImagen.innerHTML = '<img src="../../static/img/'+producto.imagen_nombre+'" alt="Imagen del producto" class="img-fluid imagen-carrito">';
                         cellNombre.innerHTML = '<h4 class="idProducto" value="'+producto.id_producto+'">'+producto.nombre+'</h4>';
                         cellPrecio.className = 'precioProducto';
-                        cellPrecio.innerHTML = producto.precio_unitario.split('.')[0];
+                        if (producto.descuentoPromocion == 0) {
+                            cellPrecio.innerHTML = producto.precio_unitario.split('.')[0];
+                            cellPrecio.setAttribute('data-precioUnitario', producto.precio_unitario.split('.')[0]);
+                        }
+                        else if (producto.descuentoPromocion != 0) {
+                            cellPrecio.innerHTML = ''+(producto.precio_unitario.split('.')[0])*(producto.descuentoPromocion/100)+'';
+                            cellPrecio.setAttribute('data-precioUnitario', producto.precio_unitario.split('.')[0]);
+                        }
                         cellDescripcion.innerHTML = producto.descripcion;
                         cellCantidad.innerHTML = '<input type="number" class="form-control cantidadProducto" value="'+producto.cantidad+'" min="1" max="'+producto.stock+'" onblur="actualizarPrecioCarrito();" id="CantidadProducto'+producto.id_producto+'">';
                         cellAcciones.innerHTML = '<button class="btn custom-button" onclick="EliminaProductoCarrito('+producto.id_producto+');"><i class="mdi mdi-trash-can-outline"></i></button>';
                         
                         FilaDatos.appendChild(cellImagen);
                         FilaDatos.appendChild(cellNombre);
-                        FilaDatos.appendChild(cellPrecio);
                         FilaDatos.appendChild(cellDescripcion);
+                        FilaDatos.appendChild(cellPrecio);
                         FilaDatos.appendChild(cellCantidad);
                         FilaDatos.appendChild(cellAcciones);
 
@@ -1628,20 +1960,29 @@ function EliminarProductoCarrito(){
 
 function actualizarPrecioCarrito(){
     var total = 0;
+    var descuentoInicial = 0;
     $('.precioProducto').each(function() {
         var precio = parseInt($(this).text());
+        var precioReal = parseInt($(this).attr('data-precioUnitario'));
         var cantidad = parseInt($(this).parent().find('.cantidadProducto').val());
+        descuentoInicial = descuentoInicial + (precioReal * cantidad);
         total = total + (precio * cantidad);
     });
+    var descuentoReal = descuentoInicial - total;
     $('#totalCarrito').text("$"+total);
     $('#Suscrito').text("No Suscrito");
+    if (descuentoReal == 0) {
     $('#DescuentoCarrito').text("Sin descuento");
+    }
+    else {
+        $('#DescuentoCarrito').text("$"+descuentoReal);
+    }
     if (GL_SUSCRITO == true) {
         var descuento = total * 0.1;
         total = total * 0.9;
         $('#totalCarrito').text("$"+total);
         $('#Suscrito').text("Suscrito");
-        $('#DescuentoCarrito').text("$"+descuento);
+        $('#DescuentoCarrito').text("$"+(parseInt(descuento + descuentoReal)).toString());
     }
 
 }
@@ -2414,6 +2755,10 @@ function mostrarDiv(div,tabla){
     if (div.toString() === 'DivSuscripcionVigente') {
         llenarCmbUsuario('cmbSuscripcionBusUsuario');
         BuscarSuscripciones();
+    }
+    if (div.toString() === 'DivPromociones') {
+        llenarCmbProducto('cboProductoPromocionoBus');
+        buscarPromociones();
     }
     
 }

@@ -51,14 +51,14 @@ class Producto(models.Model):
 
 class Promocion(models.Model):
     id_promocion = models.AutoField(primary_key=True)
-    nombre = models.CharField(max_length=100)
+    id_producto = models.ForeignKey('Producto', on_delete=models.CASCADE)
     descripcion = models.TextField()
-    descuento = models.DecimalField(max_digits=5, decimal_places=2, help_text="Descuento en porcentaje")
+    descuento = models.IntegerField()
 
     def __str__(self):
         return self.nombre
     class Meta:
-        ordering = ['nombre']
+        ordering = ['id_promocion']
 
 class Compra(models.Model):
     id_compra = models.AutoField(primary_key=True)

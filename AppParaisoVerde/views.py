@@ -48,10 +48,12 @@ def BuscarProductosCarrito(request):
             if 'carro' in request.session:
                 carro = request.session['carro']
                 productos = Producto.objects.filter(id_producto__in=carro['productos'].keys())
+                promociones = Promocion.objects.filter(id_producto__in=carro['productos'].keys())
                 productos_dict = []
                 for producto in productos:
                     producto_dict = model_to_dict(producto)
                     producto_dict['cantidad'] = carro['productos'][str(producto.id_producto)]['cantidad']
+                    producto_dict['descuentoPromocion'] = promociones.filter(id_producto=producto.id_producto)[0].descuento if promociones.filter(id_producto=producto.id_producto) else 0
                     productos_dict.append(producto_dict)
                 if productos_dict.__len__() > 0:
                     return JsonResponse({'estado': 'completado', 'datos': productos_dict})
@@ -446,10 +448,148 @@ def ImprimirDetalleCompra(request):
     else:
         return JsonResponse({'estado': 'fallido'})
 
+def AdminBuscarPromociones(request):
+    if request.method == 'POST':
+        try:
+            descuento = request.POST.get('Descuento', '0')
+            descripcion = request.POST.get('Descripcion', '')
+            producto = request.POST.get('Producto', '0')
+            promociones = Promocion.objects.raw('''
+                SELECT p.*, pr.nombre as producto_nombre
+                FROM AppParaisoVerde_promocion p
+                LEFT JOIN AppParaisoVerde_producto pr ON p.id_producto_id = pr.id_producto
+                WHERE (p.descuento = %s OR %s = '0') AND p.descripcion LIKE %s AND (p.id_producto_id = %s OR %s = '0')
+            '''
+            , [descuento, descuento, f'%{descripcion}%', producto, producto])
+
+            promociones_dict = []
+            for promocion in promociones:
+                promocion_dict = model_to_dict(promocion)
+                promocion_dict['producto_nombre'] = promocion.producto_nombre
+                promociones_dict.append(promocion_dict)
+
+            return JsonResponse({'estado': 'completado', 'datos': promociones_dict}, safe=False)
+        except Exception as e:
+            return JsonResponse({
+                'Excepciones': {
+                    'message': str(e),  # Mensaje de la excepción
+                    'type': type(e).__name__,  # Tipo de la excepción
+                    'details': traceback.format_exc()  # Detalles de la excepción
+                      }
+            })
+    else:
+        return JsonResponse({'estado': 'fallido'})
 
 
 
+def AdminEditarPromocion(request):
+    if request.method == 'POST':
+        try:
+            id_promocion = request.POST.get('IdPromocion')
+            descripcion = request.POST.get('Descripcion')
+            descuento = request.POST.get('Descuento')
 
+            promocion = get_object_or_404(Promocion, pk=id_promocion)
+            promocion.descripcion = descripcion
+            promocion.descuento = descuento
+            promocion.save()
+
+            return JsonResponse({'estado': 'completado'})
+        except Exception as e:
+            return JsonResponse({
+                'Excepciones': {
+                    'message': str(e),  # Mensaje de la excepción
+                    'type': type(e).__name__,  # Tipo de la excepción
+                    'details': traceback.format_exc()  # Detalles de la excepción
+                }
+            })
+    else:
+        return JsonResponse({'estado': 'fallido'})
+
+def AdminBuscarPromocionEditar(request):
+    if request.method == 'POST':
+        try:
+            id_promocion = request.POST.get('IdPromocion')
+            promocion = get_object_or_404(Promocion, pk=id_promocion)
+            promocion_dict = model_to_dict(promocion)
+            return JsonResponse({'estado': 'completado', 'datos': promocion_dict})
+        except Exception as e:
+            return JsonResponse({
+                'Excepciones': {
+                    'message': str(e),  # Mensaje de la excepción
+                    'type': type(e).__name__,  # Tipo de la excepción
+                    'details': traceback.format_exc()  # Detalles de la excepción
+                      }
+            })
+    else:
+        return JsonResponse({'estado': 'fallido'})
+
+
+
+def AdminEliminarPromocion(request):
+    if request.method == 'POST':
+        try:
+            id_promocion = request.POST.get('IdPromocion')
+            promocion = get_object_or_404(Promocion, pk=id_promocion)
+            promocion.delete()
+            return JsonResponse({'estado': 'completado'})
+        except Exception as e:
+            return JsonResponse({
+                'Excepciones': {
+                    'message': str(e),  # Mensaje de la excepción
+                    'type': type(e).__name__,  # Tipo de la excepción
+                    'details': traceback.format_exc()  # Detalles de la excepción
+                      }
+            })
+    else:
+        return JsonResponse({'estado': 'fallido'})
+
+
+def AdminAgregarPromocion(request):
+    if request.method == 'POST':
+        try:
+            id_producto = request.POST.get('Producto')
+            descripcion = request.POST.get('Descripcion')
+            descuento = request.POST.get('Descuento')
+
+            producto = get_object_or_404(Producto, pk=id_producto)
+            existe_promocion = Promocion.objects.filter(id_producto=producto).exists()
+            if existe_promocion:
+                return JsonResponse({'estado': 'fallido', 'error': 'Ya existe una promoción para este producto.'})
+            promocion = Promocion(id_producto=producto, descripcion=descripcion, descuento=descuento)
+            promocion.save()
+
+            return JsonResponse({'estado': 'completado'})
+        except Exception as e:
+            return JsonResponse({
+                'Excepciones': {
+                    'message': str(e),  # Mensaje de la excepción
+                    'type': type(e).__name__,  # Tipo de la excepción
+                    'details': traceback.format_exc()  # Detalles de la excepción
+                }
+            })
+    else:
+        return JsonResponse({'estado': 'fallido'})
+
+
+
+def AdminBuscarProductosCMB(request):
+    if request.method == 'POST':
+        try:
+            productos = Producto.objects.all()
+            productos_dict = [model_to_dict(producto) for producto in productos]
+            return JsonResponse({'estado': 'completado', 'datos': productos_dict}, safe=False)
+        except Exception as e:
+            return JsonResponse({
+                'Excepciones': {
+                    'message': str(e),  # Mensaje de la excepción
+                    'type': type(e).__name__,  # Tipo de la excepción
+                    'details': traceback.format_exc()  # Detalles de la excepción
+                }
+            })
+    else:
+        return JsonResponse({'estado': 'fallido'})
+    
 
 def EliminarProductoCarrito(request):
     if request.method == 'POST':
@@ -799,21 +939,25 @@ def AgregarProductoCarro(request):
 def buscarProductosComprar(request):
     if request.method == 'POST':
         try:
-            
             productos = Producto.objects.raw('''
-                SELECT p.*, t.nombre as tipo_producto_nombre
+                SELECT p.*, t.nombre as tipo_producto_nombre, pr.descuento as descuento, pr.id_promocion as promocion_id
                 FROM AppParaisoVerde_producto p
                 LEFT JOIN AppParaisoVerde_tipoproducto t ON p.tipo_producto_id = t.id_tipo_producto
+                LEFT JOIN AppParaisoVerde_promocion pr ON p.id_producto = pr.id_producto_id
             ''')
             productos_dict = []
             for producto in productos:
-                usuario_dict = model_to_dict(producto)
-                usuario_dict['tipo_producto_nombre'] = producto.tipo_producto_nombre
-                productos_dict.append(usuario_dict)
-            if productos_dict.__len__() == 0:
+                producto_dict = model_to_dict(producto)
+                producto_dict['tipo_producto_nombre'] = producto.tipo_producto_nombre
+                # Usar el alias 'promocion_id' para evitar el mapeo automático
+                producto_dict['id_promocion'] = producto.promocion_id if producto.promocion_id else None
+                producto_dict['descuento'] = producto.descuento if producto.descuento else 0
+                productos_dict.append(producto_dict)
+            if len(productos_dict) == 0:
                 return JsonResponse({'estado': 'completado', 'datos': 'sin resultados'}, safe=False)
             return JsonResponse({'estado': 'completado', 'datos': productos_dict}, safe=False)
         except Exception as e:
+    # Manejo de excepciones
             return JsonResponse({
                 'Excepciones': {
                     'message': str(e),  # Mensaje de la excepción

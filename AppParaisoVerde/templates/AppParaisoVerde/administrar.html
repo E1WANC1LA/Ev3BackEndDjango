@@ -48,6 +48,10 @@
                     <button onclick="mostrarDiv('DivSuscripcionVigente');"
                         class="nav-link opcion-navbar">Suscripciones</button>
                 </li>
+                <li class="nav-item">
+                    <button onclick="mostrarDiv('DivPromociones');"
+                        class="nav-link opcion-navbar">Promociones</button>
+                </li>
             </ul>
             <ul class="navbar-nav ml-auto">
                 <li class="nav-item">
@@ -976,6 +980,189 @@
 
 
         <!--TERMINA DIV SUSCRIPCION VIGENTE-->
+
+        <!--COMIENZA DIV PROMOCIONES-->
+        <div id="DivPromociones" style="display: none;">
+            <div class="row">
+                <div class="col-lg-12">
+                    <div class="card card-outline-info">
+                        <div class="card-body">
+                            <h4 class="card-title">Filtros</h4>
+                            <div class="form-body">
+                                <div class="row p-t-20">
+                                    <div class="col-md-6">
+                                        <div class="form-group col-6">
+                                            <label class="control-label">Descuento</label>
+                                            <input type="number" class="form-control" id="DescuentoPromocionBus">
+                                        </div>
+                                    </div>
+                                    <div class="col-md-6">
+                                        <div class="form-group col-6">
+                                            <label class="control-label">Descripción</label>
+                                            <input type="text" class="form-control" id="DescripcionPromocionBus">
+                                        </div>
+                                    </div>
+                                   
+                                </div>
+                                <div class="row">
+                                    <div class="col-md-6">
+                                        <div class="form-group col-6">
+                                            <label class="control-label">Producto</label>
+                                            <select class="form-control custom-select" id="cboProductoPromocionoBus">
+                                            </select>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="form-actions">
+                                <button type="button" class="btn custom-button" data-toggle="modal"
+                                    data-target="#modal-agregarPromociones" onclick="PrepararModalAgregarPromocion();"> <i
+                                        class="fa fa-check"></i> Agregar</button>
+                                <button type="button" class="btn custom-button" onclick="buscarPromociones()"> <i
+                                        class="fa fa-search"></i> Buscar</button>
+                            </div>
+                            <div class="modal fade " id="modal-agregarPromociones" tabindex="-1" role="dialog"
+                                aria-labelledby="exampleModalLabel1">
+                                <div class="modal-dialog modal-lg" role="document">
+                                    <div class="modal-content">
+                                        <div class="modal-header">
+                                            <h4 class="modal-title" id="exampleModalLabel1">Agregar Promocion</h4>
+                                            <button type="button" class="close" data-dismiss="modal"
+                                                aria-label="Close"><span aria-hidden="true">×</span></button>
+                                        </div>
+                                        <div class="modal-body">
+                                            <div class="row">
+                                                <div class="col-md-6">
+                                                    <div class="form-group">
+                                                        <label for="AddDescuentoPromocion" class="control-label">Porcentaje de Descuento:</label>
+                                                        <input type="number" class="form-control" placeholder="10 / 20 / 30 / 25"  id="AddDescuentoPromocion">
+                                                    </div>
+                                                </div>
+                                                <div class="col-md-6">
+                                                    <div class="form-group">
+                                                        <label for="AddDescripcionPromocion" class="control-label">Descripción:</label>
+                                                        <input type="text" class="form-control"id="AddDescripcionPromocion">
+                                                    </div>
+                                                </div>
+                                            </div>
+                                           
+                                            <div class="row">
+                                                <div class="col-md-6">
+                                                    <div class="form-group">
+                                                        <label for="AddProductoPromocion" class="control-label">Producto:</label>
+                                                        <br>
+                                                        <select id="cmbProductoAddPromocion">
+                                                            <option value="0">Seleccione Tipo Producto</option>
+                                                            <option value="1">Administrador</option>
+                                                            <option value="2">Usuario</option>
+                                                        </select>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                           
+                                        </div>
+                                        <div class="modal-footer">
+                                            <button type="button" class="btn btn-default"
+                                                data-dismiss="modal">Cancelar</button>
+                                            <button type="button" class="btn custom-button"
+                                                onclick="GrabarPromocion();">Grabar</button>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="modal fade " id="modal-editarPromocion" tabindex="-1" role="dialog"
+                                aria-labelledby="exampleModalLabel1">
+                                <div class="modal-dialog modal-lg" role="document">
+                                    <div class="modal-content">
+                                        <div class="modal-header">
+                                            <h4 class="modal-title" id="exampleModalLabel1">Editar Promocion</h4>
+                                            <button type="button" class="close" data-dismiss="modal"
+                                                aria-label="Close"><span aria-hidden="true">×</span></button>
+                                        </div>
+                                        <div class="modal-body">
+                                            <div class="row">
+                                                <div class="col-md-6">
+                                                    <div class="form-group">
+                                                        <label for="EditDescuentoPromocion" class="control-label">Descuento:</label>
+                                                        <input type="number" class="form-control" id="EditDescuentoPromocion">
+                                                    </div>
+                                                </div>
+                                                <div class="col-md-6">
+                                                    <div class="form-group">
+                                                        <label for="EditDescripcionPromocion" class="control-label">Descripción</label>
+                                                        <input type="text" class="form-control" id="EditDescripcionPromocion">
+                                                    </div>
+                                                </div>
+                                             
+                                            </div>
+                                           
+                                        </div>
+                                        <div class="modal-footer">
+                                            <button type="button" class="btn btn-default"
+                                                data-dismiss="modal">Cancelar</button>
+                                            <button type="button" class="btn custom-button"
+                                                onclick="EditarPromocion();">Grabar</button>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="modal fade" id="modal-confirmaEliminarPromocion" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
+                                <div class="modal-dialog">
+                                    <div class="modal-content">
+                                        <div class="modal-header">
+                                            <h4>
+                                                Confirmación
+                                            </h4>
+                                        </div>
+                                        <div class="modal-body">
+                                            <p id="idMensajeEliminarPromocion"></p>
+                                        </div>
+                                        <div class="modal-footer">
+                                            <button type="button" class="btn btn-large pull-right btn-default" style='margin:5px;' data-dismiss="modal">
+                                                Cancelar
+                                            </button>
+                                            <button type="button" class="btn btn-large pull-right custom-button" style='margin:5px;' data-dismiss="modal" onclick="EliminarPromocion();">
+                                                Aceptar
+                                            </button>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="row">
+                <div class="col-12">
+                    <div class="card">
+                        <div class="card-body">
+                            <h4 class="card-title">Listado de Promociones</h4>
+                            <table class="table" id="tablaPromociones">
+                                <thead>
+                                    <tr>
+                                        <th scope="col">Identificador</th>
+                                        <th scope="col">Producto</th>
+                                        <th scope="col">Descripción</th>
+                                        <th scope="col">Porcentaje de Descuento</th>
+                                        <th scope="col">Acciones</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+        
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            </div>
+                        <div id="divMensajeNoEncontradoPromociones"> <h1>No se encontraron Promociones</h1> </div>
+
+        </div>
+
+        <!--TERMINA DIV PROMOCIONES-->
 
     </div>
 
