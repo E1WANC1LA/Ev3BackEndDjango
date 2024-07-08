@@ -171,7 +171,8 @@ function buscarProductosComprar(){
                                     <p class="card-text">Nombre: ${producto.nombre}</p>
                                     <p class="card-text">Precio: ${producto.precio_unitario}</p>
                                     <p class="card-text">Tipo: ${producto.tipo_producto_nombre}</p>
-                                    <input type="number" class="quantity-input cantidad">
+                                    <p class="card-text">Stock: ${producto.stock}</p>
+                                    <input type="number" class="quantity-input cantidad" max="${producto.stock}">
                                     <button  class="add-to-cart custom-button" onclick="anadirAlCarro(this);">Añadir al carro</button>
                             </div>
                         `);
@@ -187,7 +188,8 @@ function buscarProductosComprar(){
                                     </p>
                                     <p class="card-text">Tipo: ${producto.tipo_producto_nombre}</p>
                                     <p class="card-text">Descuento: ${producto.descuento} %</p>
-                                    <input type="number" class="quantity-input cantidad">
+                                    <p class="card-text">Stock: ${producto.stock}</p>
+                                    <input type="number" class="quantity-input cantidad" max="${producto.stock}">
                                     <button  class="add-to-cart custom-button" onclick="anadirAlCarro(this);">Añadir al carro</button>
                             </div>
                         `);
@@ -1563,6 +1565,7 @@ function buscarProductosCarrito(){
                         var cellDescripcion = document.createElement("td");
                         var cellCantidad = document.createElement("td");
                         var cellAcciones = document.createElement("td");
+                        var cellStock = document.createElement("td");
 
                         
                         cellNombre.className = 'nombreProducto';
@@ -1581,12 +1584,15 @@ function buscarProductosCarrito(){
                         cellDescripcion.innerHTML = producto.descripcion;
                         cellCantidad.innerHTML = '<input type="number" class="form-control cantidadProducto" value="'+producto.cantidad+'" min="1" max="'+producto.stock+'" onblur="actualizarPrecioCarrito();" id="CantidadProducto'+producto.id_producto+'">';
                         cellAcciones.innerHTML = '<button class="btn custom-button" onclick="EliminaProductoCarrito('+producto.id_producto+');"><i class="mdi mdi-trash-can-outline"></i></button>';
-                        
+                        cellStock.innerHTML = producto.stock;
+                        cellStock.className = 'stockProducto';
+
                         FilaDatos.appendChild(cellImagen);
                         FilaDatos.appendChild(cellNombre);
                         FilaDatos.appendChild(cellDescripcion);
                         FilaDatos.appendChild(cellPrecio);
                         FilaDatos.appendChild(cellCantidad);
+                        FilaDatos.appendChild(cellStock);
                         FilaDatos.appendChild(cellAcciones);
 
     
@@ -1676,11 +1682,12 @@ function buscarProductosCarrito(){
 
 function ComprarCarrito(){
     console.log('entre comprar');
-
+    var msg = '';
     var fd = new FormData();
     var total = 0;
     var arrayProductos = [];
     $("#tablaProductosCarrito tbody tr").each(function() {
+        
         if ($(this).hasClass('filaComprarCarrito')) 
         {
             console.log('entre fila compra');
@@ -1698,6 +1705,12 @@ function ComprarCarrito(){
         }
         else
         {
+            if ($(this).find('.cantidadProducto').val() <= 0) {
+                msg = msg + '\nPor favor, introduzca una cantidad valida para el producto '+ $(this).find('.idProducto').text() +'.';
+            }
+            else if (parseInt($(this).find('.cantidadProducto').val()) > parseInt($(this).find('.stockProducto').text())) {
+                msg = msg + '\nLa cantidad del producto '+ $(this).find('.idProducto').text() +' no puede ser mayor al stock.';
+            }
         console.log('entre fila producto');
         var id_producto = $(this).find('.idProducto').attr('value');
         var cantidad = $(this).find('.cantidadProducto').val();
@@ -1710,6 +1723,10 @@ function ComprarCarrito(){
     console.log(JSON.stringify(arrayProductos));
     fd.append('Productos', JSON.stringify(arrayProductos));
     fd.append('EstadoDespacho', 'Preparando envío');
+    if (msg != '') {
+        alert(msg);
+        return;
+    }
 
 
     $.ajax({

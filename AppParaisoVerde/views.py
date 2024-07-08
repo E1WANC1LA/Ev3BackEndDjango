@@ -323,6 +323,16 @@ def ComprarCarrito(request):
             estado_despacho = request.POST.get('EstadoDespacho')
             productos_json = request.POST.get('Productos')
             productos = json.loads(productos_json)
+
+            for producto in productos:
+                id_producto = producto['id_producto']
+                cantidad = producto['cantidad']
+                precio = producto['precio']
+                productoValidar = Producto.objects.get(id_producto=id_producto)
+                if productoValidar.stock < int(cantidad):
+                    producto_nombre = Producto.objects.get(id_producto=id_producto).nombre
+                    return JsonResponse({'estado': 'fallido', 'error': 'No hay suficiente stock de '+ producto_nombre +'.'})
+
             compra = Compra(usuario_id=id_usuario, fecha_compra=fecha_actual, total=total, descontado=descontado, estado_despacho=estado_despacho)
             compra.save()
 
@@ -332,6 +342,7 @@ def ComprarCarrito(request):
                 id_producto = producto['id_producto']
                 cantidad = producto['cantidad']
                 precio = producto['precio']
+                Producto.objects.filter(id_producto=int(id_producto)).update(stock=Producto.objects.get(id_producto=int(id_producto)).stock - int(cantidad))
                 detalle_compra = DetalleCompra(compra_id=max_id_compra[0].id_compra, producto_id=id_producto, cantidad=cantidad, total_producto=precio)
                 detalle_compra.save()
             del request.session['carro']
