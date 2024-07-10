@@ -377,7 +377,7 @@ def ImprimirDetalleCompra(request):
             usuario = Usuario.objects.get(id_usuario=id_usuario)
 
             
-            ruta_imagen_absoluta = os.path.join(settings.BASE_DIR, 'static\img\logoJardineria.png')
+            ruta_imagen_absoluta = os.path.join(settings.BASE_DIR, r'static\img\logoJardineria.png')
 
             imagen = Image(ruta_imagen_absoluta, width=100, height=50 ,  hAlign='LEFT')
             elements.append(imagen)
@@ -426,7 +426,7 @@ def ImprimirDetalleCompra(request):
             detalle_data = []
             for detalle in detalle_compra:
                 producto = Producto.objects.get(id_producto=detalle.producto_id)
-                ruta_imagen = os.path.join(settings.BASE_DIR, 'static\img\\' + producto.imagen_nombre)
+                ruta_imagen = os.path.join(settings.BASE_DIR, r'static\img\\' + producto.imagen_nombre)        
                 imagen_producto = Image(ruta_imagen, width=50, height=50)  # Ajusta el tamaño según sea necesario
                 detalle_data.append([imagen_producto, producto.nombre, detalle.cantidad, detalle.total_producto])
 
