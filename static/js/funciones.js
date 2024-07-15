@@ -6,7 +6,12 @@ var GL_ID_SUSCRIPCION=0;
 var GL_SUSCRITO=false;
 var GL_ID_PROMOCION=0;
 
+var csrftoken = getCookie('csrftoken');
+console.log(csrftoken);
+
 function LlenarNavbar(){
+    var csrftoken = getCookie('csrftoken');
+console.log(csrftoken);
     var navbarHtml='';
     $.ajax({
         type: "POST",
@@ -2725,18 +2730,19 @@ function Registrarse() {
 function getCookie(name) {
     var cookieValue = null;
     if (document.cookie && document.cookie !== '') {
+        console.log('Cookie value for ' + name + ':', cookieValue); // Imprime el valor de la cookie en la consola  
         var cookies = document.cookie.split(';');
         for (var i = 0; i < cookies.length; i++) {
-            var cookie = jQuery.trim(cookies[i]);
+            var cookie = cookies[i].trim();
             if (cookie.substring(0, name.length + 1) === (name + '=')) {
                 cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
                 break;
             }
         }
     }
+    console.log('Cookie value for ' + name + ':', cookieValue); // Imprime el valor de la cookie en la consola
     return cookieValue;
 }
-
 
 
 

@@ -13,35 +13,46 @@ from uuid import uuid4
 import os,json
 from datetime import datetime, timedelta
 from django.conf import settings
+from django.views.decorators.csrf import csrf_exempt
 
 
 
+
+@csrf_exempt
 def index(request):
     if 'tipo_usuario' in request.session and request.session['tipo_usuario'] == 1:
         return render(request, 'AppParaisoVerde/administrar.html')
     return render(request, 'AppParaisoVerde/index.html')
 
+@csrf_exempt
 def iniciarSesion(request):
     return render(request, 'AppParaisoVerde/iniciarSesion.html')
 
+@csrf_exempt
 def MiPerfil(request):
     return render(request, 'AppParaisoVerde/MiPerfil.html')
 
+@csrf_exempt
 def nosotros(request):
     return render(request, 'AppParaisoVerde/nosotros.html')
 
+@csrf_exempt 
 def registro(request):
     return render(request, 'AppParaisoVerde/registro.html')
 
+@csrf_exempt
 def productos(request):
     return render(request, 'AppParaisoVerde/productos.html')
 
+@csrf_exempt
 def administrar(request):
     return render(request, 'AppParaisoVerde/administrar.html')
+@csrf_exempt
 def carrito(request):
     return render(request, 'AppParaisoVerde/carrito.html')
 
 
+@csrf_exempt
 def BuscarProductosCarrito(request):
     if request.method == 'POST':
         try:
@@ -76,6 +87,7 @@ def BuscarProductosCarrito(request):
 
 
 
+@csrf_exempt
 def AdminBuscarSuscripciones(request):
     if request.method == 'POST':
         try:
@@ -107,6 +119,7 @@ def AdminBuscarSuscripciones(request):
         return JsonResponse({'estado': 'fallido'})
 
 
+@csrf_exempt
 def BuscarMisCompras(request):
     if request.method == 'POST':
         try:
@@ -132,6 +145,7 @@ def BuscarMisCompras(request):
     else:
         return JsonResponse({'estado': 'fallido'})
 
+@csrf_exempt
 def UsuarioSuscrito(request):
     if request.method == 'POST':
         try:
@@ -168,6 +182,7 @@ def UsuarioSuscrito(request):
 
 
 
+@csrf_exempt
 def AdminCrearSuscripcion(request):
     if request.method == 'POST':
         try:
@@ -218,6 +233,7 @@ def AdminCrearSuscripcion(request):
     else:
         return JsonResponse({'estado': 'fallido'})
 
+@csrf_exempt
 def AdminBuscarUsuariosCMB(request):
     if request.method == 'POST':
         try:
@@ -237,6 +253,7 @@ def AdminBuscarUsuariosCMB(request):
 
 
 
+@csrf_exempt
 def AdminEliminarSuscripcion(request):
     if request.method == 'POST':
         try:
@@ -255,6 +272,7 @@ def AdminEliminarSuscripcion(request):
     else:
         return JsonResponse({'estado': 'fallido'})
 
+@csrf_exempt
 def BuscarInformacionUsuario(request):
     if request.method == 'POST':
         try:
@@ -273,6 +291,7 @@ def BuscarInformacionUsuario(request):
     else:
         return JsonResponse({'estado': 'fallido'})
 
+@csrf_exempt
 def Suscribirse(request):
     if request.method == 'POST':
         try:
@@ -293,6 +312,7 @@ def Suscribirse(request):
     else:
         return JsonResponse({'estado': 'fallido'})
 
+@csrf_exempt
 def CancelarSuscripcion(request):
     if request.method == 'POST':
         try:
@@ -311,6 +331,7 @@ def CancelarSuscripcion(request):
     else:
         return JsonResponse({'estado': 'fallido'})
 
+@csrf_exempt
 def ComprarCarrito(request):
     if request.method == 'POST':
         try:
@@ -360,6 +381,7 @@ def ComprarCarrito(request):
         return JsonResponse({'estado': 'fallido'})
 
 
+@csrf_exempt
 def ImprimirDetalleCompra(request):
     if request.method == 'POST':
         try:
@@ -459,6 +481,7 @@ def ImprimirDetalleCompra(request):
     else:
         return JsonResponse({'estado': 'fallido'})
 
+@csrf_exempt
 def AdminBuscarPromociones(request):
     if request.method == 'POST':
         try:
@@ -493,6 +516,7 @@ def AdminBuscarPromociones(request):
 
 
 
+@csrf_exempt
 def AdminEditarPromocion(request):
     if request.method == 'POST':
         try:
@@ -517,6 +541,7 @@ def AdminEditarPromocion(request):
     else:
         return JsonResponse({'estado': 'fallido'})
 
+@csrf_exempt
 def AdminBuscarPromocionEditar(request):
     if request.method == 'POST':
         try:
@@ -537,6 +562,7 @@ def AdminBuscarPromocionEditar(request):
 
 
 
+@csrf_exempt
 def AdminEliminarPromocion(request):
     if request.method == 'POST':
         try:
@@ -556,6 +582,7 @@ def AdminEliminarPromocion(request):
         return JsonResponse({'estado': 'fallido'})
 
 
+@csrf_exempt
 def AdminAgregarPromocion(request):
     if request.method == 'POST':
         try:
@@ -584,6 +611,7 @@ def AdminAgregarPromocion(request):
 
 
 
+@csrf_exempt
 def AdminBuscarProductosCMB(request):
     if request.method == 'POST':
         try:
@@ -602,6 +630,7 @@ def AdminBuscarProductosCMB(request):
         return JsonResponse({'estado': 'fallido'})
     
 
+@csrf_exempt
 def EliminarProductoCarrito(request):
     if request.method == 'POST':
         try:
@@ -629,6 +658,7 @@ def EliminarProductoCarrito(request):
 
 
 
+@csrf_exempt
 def AdminCrearUsuario(request):
     if request.method == 'POST':
         try:
@@ -676,6 +706,7 @@ def AdminCrearUsuario(request):
     else:
         return JsonResponse({'estado': 'fallido'})
     
+@csrf_exempt
 def AdminCrearTipoProducto(request):
     if request.method == 'POST':
         try:
@@ -697,6 +728,7 @@ def AdminCrearTipoProducto(request):
         return JsonResponse({'estado': 'fallido'})
 
 
+@csrf_exempt
 def AdminBuscarTipoProductoEditar(request):
     if request.method == 'POST':
         try:
@@ -715,6 +747,7 @@ def AdminBuscarTipoProductoEditar(request):
     else:
         return JsonResponse({'estado': 'fallido'})
 
+@csrf_exempt
 def AdminEliminarUsuario(request):
     if request.method == 'POST':
         try:
@@ -734,6 +767,7 @@ def AdminEliminarUsuario(request):
         return JsonResponse({'estado': 'fallido'})
 
 
+@csrf_exempt
 def AdminCrearProducto(request):
     if request.method == 'POST':
         try:
@@ -777,6 +811,7 @@ def AdminCrearProducto(request):
         return JsonResponse({'estado': 'fallido'})
 
 
+@csrf_exempt
 def AdminBuscarProductoEditar(request):
     if request.method == 'POST':
         try:
@@ -796,6 +831,7 @@ def AdminBuscarProductoEditar(request):
         return JsonResponse({'estado': 'fallido'})
     
 
+@csrf_exempt
 def AdminEditarProducto(request):
     if request.method == 'POST':
         try:
@@ -841,6 +877,7 @@ def AdminEditarProducto(request):
         return JsonResponse({'estado': 'fallido'})
 
 
+@csrf_exempt
 def AdminEliminarProducto(request):
     if request.method == 'POST':
         try:
@@ -863,6 +900,7 @@ def AdminEliminarProducto(request):
         return JsonResponse({'estado': 'fallido'})
     
 
+@csrf_exempt
 def FiltrarProductos(request):
     if request.method == 'POST':
         try:
@@ -897,6 +935,7 @@ def FiltrarProductos(request):
         return JsonResponse({'estado': 'fallido'})
 
 
+@csrf_exempt
 def ObtenerCantidadProductosCarro(request):
     cantidad_productos = 0
     if 'carro' in request.session:
@@ -911,6 +950,7 @@ def ObtenerCantidadProductosCarro(request):
         return JsonResponse({'estado': 'fallido'})
         
 
+@csrf_exempt
 def AgregarProductoCarro(request):
     if request.method == 'POST':
         try:
@@ -947,6 +987,7 @@ def AgregarProductoCarro(request):
     else:
         return JsonResponse({'estado': 'fallido'})
 
+@csrf_exempt
 def buscarProductosComprar(request):
     if request.method == 'POST':
         try:
@@ -980,6 +1021,7 @@ def buscarProductosComprar(request):
         return JsonResponse({'estado': 'fallido'})
 
 
+@csrf_exempt
 def AdminBuscarProductos(request):
     if request.method == 'POST':
         try:
@@ -1017,6 +1059,7 @@ def AdminBuscarProductos(request):
         return JsonResponse({'estado': 'fallido'})
 
 
+@csrf_exempt
 def ObtenerSesion(request):
     if 'idUsuario' in request.session:
         idUsuario = request.session['idUsuario']
@@ -1024,6 +1067,7 @@ def ObtenerSesion(request):
     else:
         return JsonResponse({'estado': 'fallido', 'datos': 0})
 
+@csrf_exempt
 def AdminBuscarTiposProductoCMB(request):
     if request.method == 'POST':
         try:
@@ -1041,6 +1085,7 @@ def AdminBuscarTiposProductoCMB(request):
     else:
         return JsonResponse({'estado': 'fallido'})
 
+@csrf_exempt
 def cerrarSesion(request):
     try:
         del request.session['tipo_usuario']
@@ -1056,6 +1101,7 @@ def cerrarSesion(request):
                   }
         })
 
+@csrf_exempt
 def AdminEditarUsuario(request):
     if request.method == 'POST':
         try:
@@ -1093,6 +1139,7 @@ def AdminEditarUsuario(request):
     else:
         return JsonResponse({'estado': 'fallido'})
 
+@csrf_exempt
 def AdminBuscarUsuarioEditar(request):
     if request.method == 'POST':
         try:
@@ -1109,6 +1156,7 @@ def AdminBuscarUsuarioEditar(request):
                       }
             })
 
+@csrf_exempt
 def AdminBuscarUsuarios(request):
     if request.method == 'POST':
         try:
@@ -1140,6 +1188,7 @@ def AdminBuscarUsuarios(request):
     else:
         return JsonResponse({'estado': 'fallido'})
 
+@csrf_exempt
 def AdminBuscarTiposUsuarioCMB(request):
     if request.method == 'POST':
         try:
@@ -1158,6 +1207,7 @@ def AdminBuscarTiposUsuarioCMB(request):
         return JsonResponse({'estado': 'fallido'})
     
 
+@csrf_exempt
 def AdminEditarTipoProducto(request):
     if request.method == 'POST':
         try:
@@ -1180,6 +1230,7 @@ def AdminEditarTipoProducto(request):
     else:
         return JsonResponse({'estado': 'fallido'})
 
+@csrf_exempt
 def AdminEliminarTipoProducto(request):
     if request.method == 'POST':
         try:
@@ -1198,6 +1249,7 @@ def AdminEliminarTipoProducto(request):
     else:
         return JsonResponse({'estado': 'fallido'})
 
+@csrf_exempt
 def AdminBuscarTiposProducto(request):
     if request.method == 'POST':
         try:
@@ -1225,6 +1277,7 @@ def AdminBuscarTiposProducto(request):
     else:
         return JsonResponse({'estado': 'fallido'})
 
+@csrf_exempt
 def AdminBuscarTiposUsuario(request):
     if request.method == 'POST':
         try:
@@ -1254,6 +1307,7 @@ def AdminBuscarTiposUsuario(request):
         return JsonResponse({'estado': 'fallido'})
     
 
+@csrf_exempt
 def AdminEditarTipoUsuario(request):
     if request.method == 'POST':
         try:
@@ -1276,6 +1330,7 @@ def AdminEditarTipoUsuario(request):
     else:
         return JsonResponse({'estado': 'fallido'})
 
+@csrf_exempt
 def AdminBuscarTipoUsuarioEditar(request):
     if request.method == 'POST':
         try:
@@ -1294,6 +1349,7 @@ def AdminBuscarTipoUsuarioEditar(request):
     else:
         return JsonResponse({'estado': 'fallido'})
     
+@csrf_exempt
 def AdminEliminarTipoUsuario(request):
     if request.method == 'POST':
         try:
@@ -1312,6 +1368,7 @@ def AdminEliminarTipoUsuario(request):
     else:
         return JsonResponse({'estado': 'fallido'})
 
+@csrf_exempt
 def AdminCrearTipoUsuario(request):
     if request.method == 'POST':
         try:
@@ -1333,6 +1390,7 @@ def AdminCrearTipoUsuario(request):
         return JsonResponse({'estado': 'fallido'})
 
 
+@csrf_exempt
 def crearUsuario(request):
     if request.method == 'POST':
         try:
@@ -1380,6 +1438,7 @@ def crearUsuario(request):
     else:
         return JsonResponse({'estado': 'fallido'})
 
+@csrf_exempt 
 def abrirSesion(request):
     if request.method == 'POST':
         try:
